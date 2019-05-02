@@ -221,10 +221,10 @@ var JsPlugin = function (_Plugin) {
 		var defaultOptions = {
 			'*': {
 				out: function out(next) {
-					next();
+					return next();
 				},
 				in: function _in(next) {
-					next();
+					return next();
 				}
 			}
 		};

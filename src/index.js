@@ -7,12 +7,8 @@ export default class JsPlugin extends Plugin {
 		super();
 		const defaultOptions = {
 			'*': {
-				out: (next) => {
-					next();
-				},
-				in: (next) => {
-					next();
-				}
+				out: (next) => next(),
+				in: (next) => next()
 			}
 		};
 
