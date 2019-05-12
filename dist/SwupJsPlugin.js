@@ -46,17 +46,32 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, {
-/******/ 				configurable: false,
-/******/ 				enumerable: true,
-/******/ 				get: getter
-/******/ 			});
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
 /******/ 		}
 /******/ 	};
 /******/
 /******/ 	// define __esModule on exports
 /******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
 /******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
 /******/ 	};
 /******/
 /******/ 	// getDefaultExport function for compatibility with non-harmony modules
@@ -76,7 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 0);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -86,42 +101,13 @@ return /******/ (function(modules) { // webpackBootstrap
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
+var _index = __webpack_require__(1);
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _index2 = _interopRequireDefault(_index);
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var Plugin = function () {
-    function Plugin() {
-        _classCallCheck(this, Plugin);
-
-        this.isSwupPlugin = true;
-    }
-
-    _createClass(Plugin, [{
-        key: "mount",
-        value: function mount() {
-            // this is mount method rewritten by class extending
-            // and is executed when swup is enabled with plugin
-        }
-    }, {
-        key: "unmount",
-        value: function unmount() {}
-        // this is unmount method rewritten by class extending
-        // and is executed when swup with plugin is disabled
-
-
-        // this is here so we can tell if plugin was created by extending this class
-
-    }]);
-
-    return Plugin;
-}();
-
-exports.default = Plugin;
+module.exports = _index2.default; // this is here for webpack to expose SwupPlugin as window.SwupPlugin
 
 /***/ }),
 /* 1 */
@@ -138,7 +124,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _plugin = __webpack_require__(0);
+var _plugin = __webpack_require__(2);
 
 var _plugin2 = _interopRequireDefault(_plugin);
 
@@ -160,7 +146,7 @@ var JsPlugin = function (_Plugin) {
 
 		var _this = _possibleConstructorReturn(this, (JsPlugin.__proto__ || Object.getPrototypeOf(JsPlugin)).call(this));
 
-		_this.name = 'SwupJsPlugin';
+		_this.name = 'JsPlugin';
 
 		_this.getAnimationPromises = function (type) {
 			var animation = _this.getAnimation(_this.swup.transition, type);
@@ -261,13 +247,42 @@ exports.default = JsPlugin;
 "use strict";
 
 
-var _index = __webpack_require__(1);
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
-var _index2 = _interopRequireDefault(_index);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-module.exports = _index2.default; // this is here for webpack to expose SwupPlugin as window.SwupPlugin
+var Plugin = function () {
+    function Plugin() {
+        _classCallCheck(this, Plugin);
+
+        this.isSwupPlugin = true;
+    }
+
+    _createClass(Plugin, [{
+        key: "mount",
+        value: function mount() {
+            // this is mount method rewritten by class extending
+            // and is executed when swup is enabled with plugin
+        }
+    }, {
+        key: "unmount",
+        value: function unmount() {}
+        // this is unmount method rewritten by class extending
+        // and is executed when swup with plugin is disabled
+
+
+        // this is here so we can tell if plugin was created by extending this class
+
+    }]);
+
+    return Plugin;
+}();
+
+exports.default = Plugin;
 
 /***/ })
 /******/ ]);

@@ -1,7 +1,7 @@
 import Plugin from '@swup/plugin';
 
 export default class JsPlugin extends Plugin {
-	name = 'SwupJsPlugin';
+	name = 'JsPlugin';
 
 	constructor(options = {}) {
 		super();
