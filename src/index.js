@@ -1,21 +1,28 @@
 import Plugin from '@swup/plugin';
+import pathToRegexp from 'path-to-regexp';
 
 export default class JsPlugin extends Plugin {
 	name = 'JsPlugin';
 
+	currentAnimation = null;
+
 	constructor(options = {}) {
 		super();
-		const defaultOptions = {
-			'*': {
+		const defaultOptions = [
+			{
+				from: '(.*)',
+				to: '(.*)',
 				out: (next) => next(),
 				in: (next) => next()
 			}
-		};
+		];
 
 		this.options = {
 			...defaultOptions,
 			...options
 		};
+
+		this.generateRegex();
 	}
 
 	mount() {
@@ -30,59 +37,81 @@ export default class JsPlugin extends Plugin {
 		swup._getAnimationPromises = null;
 	}
 
+	generateRegex() {
+		const isRegex = (str) => str instanceof RegExp;
+
+		this.options = Object.keys(this.options).map((key) => {
+			return {
+				...this.options[key],
+				regFrom: isRegex(this.options[key].from)
+					? this.options[key].from
+					: pathToRegexp(this.options[key].from),
+				regTo: isRegex(this.options[key].to)
+					? this.options[key].to
+					: pathToRegexp(this.options[key].to)
+			};
+		});
+	}
+
 	getAnimationPromises = (type) => {
-		const animation = this.getAnimation(this.swup.transition, type);
-		return [this.createAnimationPromise(animation)];
+		const animationIndex = this.getAnimationIndex(type);
+		return [this.createAnimationPromise(animationIndex, type)];
 	};
 
-	createAnimationPromise = (fn) => {
+	createAnimationPromise = (index, type) => {
+		const currentTransitionRoutes = this.swup.transition;
+		const animation = this.options[index];
+
 		return new Promise((resolve) => {
-			fn(resolve);
+			animation[type](resolve, {
+				paramsFrom: animation.regFrom.exec(currentTransitionRoutes.from),
+				paramsTo: animation.regTo.exec(currentTransitionRoutes.to),
+				transition: currentTransitionRoutes,
+				from: animation.from,
+				to: animation.to
+			});
 		});
 	};
 
-	getAnimation = (transition, type) => {
-		let animations = this.options;
-		let animation = null;
-		let animationName = null;
-		let topRating = 0;
-
-		Object.keys(animations).forEach((item) => {
-			let rating = 0;
-			if (item.includes('>')) {
-				let route = item.split('>');
-				let from = route[0];
-				let to = route[1];
-
-				// TO equals to TO
-				if (to == transition.to || to == '*') {
-					rating++;
-				}
-
-				// equals to CUSTOM animation
-				if (to == transition.custom) {
-					rating = rating + 2;
-				}
-
-				// FROM equals or is ANY
-				if (from == transition.from || from == '*') {
-					rating++;
-				}
-			}
-
-			// set new final animation
-			if (rating > topRating) {
-				topRating = rating;
-				animationName = item;
-				animation = animations[item];
-			}
-		});
-
-		if (animation == null || topRating == 1) {
-			animation = animations['*'];
-			animationName = '*';
+	getAnimationIndex = (type) => {
+		// already saved from out animation
+		if (type === 'in') {
+			return this.currentAnimation;
 		}
 
-		return animation[type];
+		const animations = this.options;
+		let animationIndex = 0;
+		let topRating = 0;
+
+		Object.keys(animations).forEach((key, index) => {
+			const animation = animations[key];
+			const rating = this.rateAnimation(animation);
+
+			if (rating >= topRating) {
+				animationIndex = index;
+				topRating = rating;
+			}
+		});
+
+		this.currentAnimation = animationIndex;
+		return this.currentAnimation;
+	};
+
+	rateAnimation = (animation) => {
+		const currentTransitionRoutes = this.swup.transition;
+		let rating = 0;
+
+		// run regex
+		const fromMatched = animation.regFrom.test(currentTransitionRoutes.from);
+		const toMatched = animation.regTo.test(currentTransitionRoutes.to);
+
+		// check if regex passes
+		rating += fromMatched ? 1 : 0;
+		rating += toMatched ? 1 : 0;
+
+		// beat all other if custom parameter fits
+		rating += fromMatched && animation.to === currentTransitionRoutes.custom ? 2 : 0;
+
+		return rating;
 	};
 }
