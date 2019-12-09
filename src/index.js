@@ -63,13 +63,15 @@ export default class JsPlugin extends Plugin {
 		const animation = this.options[index];
 
 		return new Promise((resolve) => {
-			animation[type](resolve, {
-				paramsFrom: animation.regFrom.exec(currentTransitionRoutes.from),
-				paramsTo: animation.regTo.exec(currentTransitionRoutes.to),
-				transition: currentTransitionRoutes,
-				from: animation.from,
-				to: animation.to
-			});
+			if( animation ) {
+				animation[type](resolve, {
+					paramsFrom: animation.regFrom.exec(currentTransitionRoutes.from),
+					paramsTo: animation.regTo.exec(currentTransitionRoutes.to),
+					transition: currentTransitionRoutes,
+					from: animation.from,
+					to: animation.to
+				});
+			}
 		});
 	};
 
