@@ -5,6 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "compile": "babel --presets es2015,stage-0 -d lib/ src/",
+    "lint": "prettier src/**/*.{js,mjs} --write",
     "build": "webpack-cli",
     "prepublish": "npm run compile && npm run build"
   },
@@ -33,5 +34,6 @@
   "dependencies": {
     "@swup/plugin": "^1.0.0",
     "path-to-regexp": "^3.0.0"
-  }
+  },
+  "prettier": "@swup/prettier-config"
 }
