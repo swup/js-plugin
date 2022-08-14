@@ -33,6 +33,8 @@ export default class JsPlugin extends Plugin {
 	}
 
 	unmount() {
+		const swup = this.swup;
+
 		swup.getAnimationPromises = swup._getAnimationPromises;
 		swup._getAnimationPromises = null;
 	}
