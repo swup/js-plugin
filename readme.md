@@ -1,10 +1,10 @@
-# Swup JS plugin (swupjs)
+# Swup JS Plugin (formerly `swupjs`)
 
 Plugin modifies swup for use with JavaScript animations. Timing and animations are based on JavaScript, not CSS transitions.
 
-Plugin provides the similar, but improved functionality as deprecated [swupjs](https://github.com/swup/swupjs).
+Plugin provides similar but improved functionality as the deprecated [swupjs](https://github.com/swup/swupjs) package.
 
-## Instalation
+## Installation
 
 This plugin can be installed with npm
 
@@ -117,7 +117,7 @@ Those properties can take several forms:
 
 Most fitting route is always chosen.
 Keep in mind, that two routes can be evaluated as "same fit".
-In such case, the later one defined in the options is used, so usually you would like to define more specific route later.  
+In such case, the later one defined in the options is used, so usually you would like to define more specific route later.
 See example below for more info.
 
 ```javascript
