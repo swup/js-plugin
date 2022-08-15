@@ -85,14 +85,16 @@ const options = [
     to: '(.*)',
     in: (next) => {
       document.querySelector('#swup').style.opacity = 0;
-      TweenLite.to(document.querySelector('#swup'), 0.5, {
+      gsap.to(document.querySelector('#swup'), {
+        duration: 0.5,
         opacity: 1,
         onComplete: next
       });
     },
     out: (next) => {
       document.querySelector('#swup').style.opacity = 1;
-      TweenLite.to(document.querySelector('#swup'), 0.5, {
+      gsap.to(document.querySelector('#swup'), 0.5, {
+        duration: 0.5,
         opacity: 0,
         onComplete: next
       });
