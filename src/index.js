@@ -64,6 +64,11 @@ export default class JsPlugin extends Plugin {
 		const currentTransitionRoutes = this.swup.transition;
 		const animation = this.options[index];
 
+		if (!(animation && animation[type])) {
+			console.warn('No animation found');
+			return Promise.resolve();
+		}
+
 		return new Promise((resolve) => {
 			animation[type](resolve, {
 				paramsFrom: animation.regFrom.exec(currentTransitionRoutes.from),
