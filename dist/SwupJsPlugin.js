@@ -162,6 +162,11 @@ var JsPlugin = function (_Plugin) {
 			var currentTransitionRoutes = _this.swup.transition;
 			var animation = _this.options[index];
 
+			if (!(animation && animation[type])) {
+				console.warn('No animation found');
+				return Promise.resolve();
+			}
+
 			return new Promise(function (resolve) {
 				animation[type](resolve, {
 					paramsFrom: animation.regFrom.exec(currentTransitionRoutes.from),
