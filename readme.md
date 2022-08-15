@@ -1,8 +1,8 @@
 # Swup JS Plugin (formerly `swupjs`)
 
-Plugin modifies swup for use with JavaScript animations. Timing and animations are based on JavaScript, not CSS transitions.
+JS Plugin enables the use of JavaScript for timing and animations in [Swup](https://swup.js.org) page transitions.
 
-Plugin provides similar but improved functionality as the deprecated [swupjs](https://github.com/swup/swupjs) package.
+This plugin is the successor of the deprecated [swupjs](https://github.com/swup/swupjs) package, with similar but improved functionality.
 
 ## Installation
 
@@ -12,7 +12,7 @@ This plugin can be installed with npm
 npm install @swup/js-plugin
 ```
 
-and included with import
+and included with an import
 
 ```shell
 import SwupJsPlugin from '@swup/js-plugin';
@@ -36,9 +36,9 @@ const swup = new Swup({
 
 ## Options
 
-Plugin options is an an array of animation objects.
+The plugin options are an an array of animation objects.
 The example below is the default setup and defines two animations,
-where `out` is the animation (function) being executed before content replace, and `in` is animation being executed after the content is replaced.
+where `out` is the animation (function) being executed before the content is being replaced, and `in` is animation being executed after the content is replaced.
 This is also an animation object that swup will fallback to in case no other fitting animation object is found.
 
 Animations are chosen based on the `from` and `to` properties of the object, which are compared against current transition (routes of current and next page).
@@ -57,16 +57,16 @@ const options = [
 
 ## Animation Function
 
-Animation function receives two parameter, `next` function and additional parameters.
-Call of `next` function serves as an indicator, that animation is done and must be called once.
+The animation function receives two parameters, `next()` function and additional parameters.
+The `next()` function serves as an indicator that the animation is done and must be called once.
 In a real world example, `next()` would be called as a callback of the animation.
-By default no animation is being executed and next() is called right away.
+By default no animation is being executed and `next()` is called right away.
 
-Additional parameters include some useful data, like transition object (containing actual before/after routes), `from` and `to` parameters of animation object, and the result of executing the Regex with the routes (array).
+Additional parameters include some useful data, like transition object (containing actual before/after routes), `from` and `to` parameters of the animation object, and the result of executing the Regex with the routes (`array`).
 
-In the example below, next function is called after two seconds,
-which means that swup would wait two seconds (or any time necessary for the load of the new page content),
-before continuing to the content replace.
+In the example below, the `next` function is called after two seconds,
+which means that swup would wait at least two seconds (or any time necessary to load the new page content),
+before continuing to replacing the content.
 
 ```javascript
 ///...
@@ -76,7 +76,7 @@ out: (next) => {
 // ...
 ```
 
-Basic usage with tools like GSAP would look something like the following:
+Basic usage with tools like [GSAP](https://greensock.com/gsap/) would look something like this:
 
 ```javascript
 const options = [
@@ -107,18 +107,18 @@ const swup = new Swup({
 
 ## Choosing the animation
 
-As mentioned, animation is chosen based on the `from` and `to` properties of the animation object.
+As mentioned, the animation is chosen based on the `from` and `to` properties of the animation object.
 Those properties can take several forms:
 
-- String (matching a route exactly).
-- Regex.
-- Path route definition which you may know from things like [Express](https://expressjs.com/) (eg. `/foo/:bar`). [Path-to-RegExp](https://github.com/pillarjs/path-to-regexp) library is used for this purpose, so refer to their documentation.
-- String of custom transition (taken from `data-swup-transition` attribute of the clicked link).
+- A String (matching a route exactly).
+- A Regex.
+- A Path route definition which you may know from things like [Express](https://expressjs.com/) (eg. `/foo/:bar`). The [Path-to-RegExp](https://github.com/pillarjs/path-to-regexp) library is used for this purpose, so refer to their documentation.
+- A String of custom transitions (taken from the `data-swup-transition` attribute of the clicked link).
 
-Most fitting route is always chosen.
+The most fitting route is always chosen.
 Keep in mind, that two routes can be evaluated as "same fit".
-In such case, the later one defined in the options is used, so usually you would like to define more specific route later.
-See example below for more info.
+In this case, the later one defined in the options is used, so usually you would like to define the more specific routes later.
+See the example below for more info.
 
 ```javascript
 [
