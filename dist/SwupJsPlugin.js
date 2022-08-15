@@ -243,6 +243,8 @@ var JsPlugin = function (_Plugin) {
 	}, {
 		key: 'unmount',
 		value: function unmount() {
+			var swup = this.swup;
+
 			swup.getAnimationPromises = swup._getAnimationPromises;
 			swup._getAnimationPromises = null;
 		}
@@ -299,9 +301,19 @@ var Plugin = function () {
         }
     }, {
         key: "unmount",
-        value: function unmount() {}
-        // this is unmount method rewritten by class extending
-        // and is executed when swup with plugin is disabled
+        value: function unmount() {
+            // this is unmount method rewritten by class extending
+            // and is executed when swup with plugin is disabled
+        }
+    }, {
+        key: "_beforeMount",
+        value: function _beforeMount() {
+            // here for any future hidden auto init
+        }
+    }, {
+        key: "_afterUnmount",
+        value: function _afterUnmount() {}
+        // here for any future hidden auto-cleanup
 
 
         // this is here so we can tell if plugin was created by extending this class
@@ -321,6 +333,8 @@ exports.default = Plugin;
  * Expose `pathToRegexp`.
  */
 module.exports = pathToRegexp
+module.exports.match = match
+module.exports.regexpToFunction = regexpToFunction
 module.exports.parse = parse
 module.exports.compile = compile
 module.exports.tokensToFunction = tokensToFunction
@@ -436,26 +450,67 @@ function parse (str, options) {
  * @return {!function(Object=, Object=)}
  */
 function compile (str, options) {
-  return tokensToFunction(parse(str, options))
+  return tokensToFunction(parse(str, options), options)
+}
+
+/**
+ * Create path match function from `path-to-regexp` spec.
+ */
+function match (str, options) {
+  var keys = []
+  var re = pathToRegexp(str, keys, options)
+  return regexpToFunction(re, keys)
+}
+
+/**
+ * Create a path match function from `path-to-regexp` output.
+ */
+function regexpToFunction (re, keys) {
+  return function (pathname, options) {
+    var m = re.exec(pathname)
+    if (!m) return false
+
+    var path = m[0]
+    var index = m.index
+    var params = {}
+    var decode = (options && options.decode) || decodeURIComponent
+
+    for (var i = 1; i < m.length; i++) {
+      if (m[i] === undefined) continue
+
+      var key = keys[i - 1]
+
+      if (key.repeat) {
+        params[key.name] = m[i].split(key.delimiter).map(function (value) {
+          return decode(value, key)
+        })
+      } else {
+        params[key.name] = decode(m[i], key)
+      }
+    }
+
+    return { path: path, index: index, params: params }
+  }
 }
 
 /**
  * Expose a method for transforming tokens into the path function.
  */
-function tokensToFunction (tokens) {
+function tokensToFunction (tokens, options) {
   // Compile all the tokens into regexps.
   var matches = new Array(tokens.length)
 
   // Compile all the patterns before compilation.
   for (var i = 0; i < tokens.length; i++) {
     if (typeof tokens[i] === 'object') {
-      matches[i] = new RegExp('^(?:' + tokens[i].pattern + ')$')
+      matches[i] = new RegExp('^(?:' + tokens[i].pattern + ')$', flags(options))
     }
   }
 
   return function (data, options) {
     var path = ''
     var encode = (options && options.encode) || encodeURIComponent
+    var validate = options ? options.validate !== false : true
 
     for (var i = 0; i < tokens.length; i++) {
       var token = tokens[i]
@@ -482,7 +537,7 @@ function tokensToFunction (tokens) {
         for (var j = 0; j < value.length; j++) {
           segment = encode(value[j], token)
 
-          if (!matches[i].test(segment)) {
+          if (validate && !matches[i].test(segment)) {
             throw new TypeError('Expected all "' + token.name + '" to match "' + token.pattern + '"')
           }
 
@@ -495,7 +550,7 @@ function tokensToFunction (tokens) {
       if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
         segment = encode(String(value), token)
 
-        if (!matches[i].test(segment)) {
+        if (validate && !matches[i].test(segment)) {
           throw new TypeError('Expected "' + token.name + '" to match "' + token.pattern + '", but got "' + segment + '"')
         }
 
