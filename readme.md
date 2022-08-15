@@ -57,8 +57,8 @@ const options = [
 
 ## Animation Function
 
-The animation function receives two parameters, `next()` function and additional parameters.
-The `next()` function serves as an indicator that the animation is done and must be called once.
+The animation function receives two parameters: The `next()` function and an object that contains information about the current animation.
+The `next()` function must be called once and serves as an indicator that the animation is done and swup can proceed with replacing the content.
 In a real world example, `next()` would be called as a callback of the animation.
 By default no animation is being executed and `next()` is called right away.
 
@@ -83,7 +83,7 @@ const options = [
   {
     from: '(.*)',
     to: '(.*)',
-    in: function(next) {
+    in: (next) => {
       document.querySelector('#swup').style.opacity = 0;
       TweenLite.to(document.querySelector('#swup'), 0.5, {
         opacity: 1,
