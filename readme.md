@@ -1,27 +1,25 @@
 # Swup JS Plugin (formerly `swupjs`)
 
-JS Plugin enables the use of JavaScript for timing and animations in [Swup](https://swup.js.org) 
-page transitions. It is is the successor of the deprecated [swupjs](https://github.com/swup/swupjs) package, 
+JS Plugin enables the use of JavaScript for timing and animations in [Swup](https://swup.js.org)
+page transitions. It is is the successor of the deprecated [swupjs](https://github.com/swup/swupjs) package,
 with similar but improved functionality.
 
 ## Installation
 
-This plugin can be installed with npm
+Install the plugin from npm and import it into your bundle.
 
 ```bash
 npm install @swup/js-plugin
 ```
 
-and included with an import
-
-```shell
+```js
 import SwupJsPlugin from '@swup/js-plugin';
 ```
 
-or included from the dist folder
+Or include the minified production file from a CDN:
 
 ```html
-<script src="./dist/SwupJsPlugin.js"></script>
+<script src="https://unpkg.com/@swup/js-plugin@2"></script>
 ```
 
 ## Usage
@@ -39,8 +37,8 @@ const swup = new Swup({
 ## Options
 
 The plugin expects a single argument in the form of an `array` of animation objects.
-The example below is the default setup and defines two animations, where `out` is the 
-animation (function) being executed before the content is being replaced, and `in` is 
+The example below is the default setup and defines two animations, where `out` is the
+animation (function) being executed before the content is being replaced, and `in` is
 the animation being executed after the content is replaced:
 
 ```javascript
@@ -54,30 +52,30 @@ const options = [
 ];
 ```
 
-This is also the animation object that swup will fall-back to in case no other fitting 
+This is also the animation object that swup will fall-back to in case no other fitting
 animation object is found.
 
-Animations are chosen based on the `from` and `to` properties of the object, which are 
-compared against the current transition (routes of current and next page). 
+Animations are chosen based on the `from` and `to` properties of the object, which are
+compared against the current transition (routes of current and next page).
 More on that [here](#choosing-the-animation).
 
 ## Animation Function
 
-The animation function receives two parameters: 
-- The `next()` function 
+The animation function receives two parameters:
+- The `next()` function
 - an object that contains information about the current animation.
 
-The `next()` function must be called once and serves as an indicator that the animation 
+The `next()` function must be called once and serves as an indicator that the animation
 is done and swup can proceed with replacing the content.
 In a real world example, `next()` would be called as a callback of the animation.
 By default no animation is being executed and `next()` is called right away.
 
-The second parameter is an object that contains some useful data, like the transition 
-object (containing actual before/after routes), the `from` and `to` parameters of the 
+The second parameter is an object that contains some useful data, like the transition
+object (containing actual before/after routes), the `from` and `to` parameters of the
 animation object, and the result of executing the Regex with the routes (`array`).
 
 In the example below, the `next` function is called after two seconds,
-which means that swup would wait at least two seconds (or any time necessary 
+which means that swup would wait at least two seconds (or any time necessary
 to load the new page content), before continuing to replacing the content.
 
 ```javascript
