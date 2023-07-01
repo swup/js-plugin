@@ -110,7 +110,7 @@ animation object, and the result of executing the Regex with the routes (`array`
 
 Basic usage with animation libraries looks like this:
 
-### GSAP
+### [GSAP](https://greensock.com/gsap/)
 
 ```js
 {
@@ -129,7 +129,7 @@ Basic usage with animation libraries looks like this:
 }
 ```
 
-### anime.js
+### [anime.js](https://animejs.com/)
 
 ```js
 {
