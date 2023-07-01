@@ -1,8 +1,8 @@
 import Plugin from '@swup/plugin';
 import pathToRegexp from 'path-to-regexp';
 
-export default class JsPlugin extends Plugin {
-	name = 'JsPlugin';
+export default class SwupJsPlugin extends Plugin {
+	name = 'SwupJsPlugin';
 
 	currentAnimation = null;
 
