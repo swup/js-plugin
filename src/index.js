@@ -5,6 +5,7 @@ export default class SwupJsPlugin extends Plugin {
 	name = 'SwupJsPlugin';
 
 	currentAnimation = null;
+	requires = { swup: '>=4' };
 
 	constructor(options = {}) {
 		super();
