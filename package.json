@@ -37,8 +37,7 @@
     "url": "https://github.com/swup/js-plugin.git"
   },
   "dependencies": {
-    "@swup/plugin": "^2.0.0",
-    "path-to-regexp": "^3.0.0"
+    "@swup/plugin": "^2.0.0"
   },
   "peerDependencies": {
     "swup": "^3.0.0"
