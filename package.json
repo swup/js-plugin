@@ -2,7 +2,7 @@
   "name": "@swup/js-plugin",
   "amdName": "SwupJsPlugin",
   "version": "2.0.0",
-  "description": "Swup JS plugin. (swupjs)",
+  "description": "A swup plugin for managing transitions in JS",
   "type": "module",
   "source": "src/index.js",
   "main": "./dist/index.cjs",

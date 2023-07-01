@@ -1,8 +1,9 @@
-# Swup JS Plugin (formerly `swupjs`)
+# Swup JS Plugin
 
-JS Plugin enables the use of JavaScript for timing and animations in [Swup](https://swup.js.org)
-page transitions. It is is the successor of the deprecated [swupjs](https://github.com/swup/swupjs) package,
-with similar but improved functionality.
+A [swup](https://swup.js.org) plugin for managing transitions in JS.
+
+- Use JavaScript for timing and animations instead of CSS
+- Successor to the deprecated [swupjs](https://github.com/swup/swupjs) library
 
 ## Installation
 
@@ -19,102 +20,132 @@ import SwupJsPlugin from '@swup/js-plugin';
 Or include the minified production file from a CDN:
 
 ```html
-<script src="https://unpkg.com/@swup/js-plugin@2"></script>
+<script src="https://unpkg.com/@swup/js-plugin@3"></script>
 ```
 
 ## Usage
 
 To run this plugin, include an instance in the swup options.
 
-```javascript
+```js
 const swup = new Swup({
-  plugins: [new SwupJsPlugin([
-    // your custom transition objects
-  ])]
+  plugins: [
+    new SwupJsPlugin({ animations: [ /* your custom animation functions */ ] })
+  ]
 });
 ```
 
 ## Options
 
-The plugin expects a single argument in the form of an `array` of animation objects.
+The plugin expects an `array` of animation objects.
 The example below is the default setup and defines two animations, where `out` is the
-animation (function) being executed before the content is being replaced, and `in` is
+animation function being executed before the content is being replaced, and `in` is
 the animation being executed after the content is replaced:
 
-```javascript
-const options = [
-  {
-    from: '(.*)', // matches any route
-    to: '(.*)', // matches any route
-    out: next => next(), // immediately continues
-    in: next => next() // immediately continues
-  }
-];
+```js
+{
+  animations: [
+    {
+      from: '(.*)', // matches any route
+      to: '(.*)', // matches any route
+      out: done => done(), // immediately continues
+      in: done => done() // immediately continues
+    }
+  ]
+}
 ```
 
-This is also the animation object that swup will fall-back to in case no other fitting
+This is also the animation object that swup will fall-back to in case no other matching
 animation object is found.
 
 Animations are chosen based on the `from` and `to` properties of the object, which are
-compared against the current transition (routes of current and next page).
-More on that [here](#choosing-the-animation).
+compared against the current page transition (urls of current and next page).
+Learn more on [choosing the animation](#choosing-the-animation) below.
 
-## Animation Function
+## Animation function
 
-The animation function receives two parameters:
-- The `next()` function
-- an object that contains information about the current animation.
+The animation function receives two parameters: a `done` function and a data object.
 
-The `next()` function must be called once and serves as an indicator that the animation
+### `done()` function
+
+The `done()` function must be called once and serves as an indicator that the animation
 is done and swup can proceed with replacing the content.
-In a real world example, `next()` would be called as a callback of the animation.
-By default no animation is being executed and `next()` is called right away.
+In a real world example, `done()` would be used as a callback of the animation library.
+By default no animation is being executed and `done()` is called right away.
+
+In the example below, the `done` function is called after two seconds,
+which means that swup would wait at least two seconds (or any time necessary
+to load the new page content), before continuing to replace the content.
+
+```js
+out: (done) => {
+  setTimeout(done, 2000);
+}
+```
+
+### Data object
 
 The second parameter is an object that contains some useful data, like the transition
 object (containing actual before/after routes), the `from` and `to` parameters of the
 animation object, and the result of executing the Regex with the routes (`array`).
 
-In the example below, the `next` function is called after two seconds,
-which means that swup would wait at least two seconds (or any time necessary
-to load the new page content), before continuing to replacing the content.
-
-```javascript
-///...
-out: (next) => {
-  setTimeout(next, 2000);
-};
-// ...
+```js
+{
+  context: { /* */ }, // swup global context object
+  direction: 'in',
+  from: {
+    url: '/',
+    pattern: '(.*)',
+    params: {}
+  },
+  to: {
+    url: '/about',
+    pattern: '(.*)',
+    params: {}
+  }
+}
 ```
 
-Basic usage with tools like [GSAP](https://greensock.com/gsap/) would look something like this:
+## Example
 
-```javascript
-const options = [
-  {
-    from: '(.*)',
-    to: '(.*)',
-    in: (next, infos) => {
-      document.querySelector('#swup').style.opacity = 0;
-      gsap.to(document.querySelector('#swup'), {
-        duration: 0.5,
-        opacity: 1,
-        onComplete: next
-      });
-    },
-    out: (next, infos) => {
-      document.querySelector('#swup').style.opacity = 1;
-      gsap.to(document.querySelector('#swup'), 0.5, {
-        duration: 0.5,
-        opacity: 0,
-        onComplete: next
-      });
-    }
+Basic usage with animation libraries looks like this:
+
+### GSAP
+
+```js
+{
+  from: '(.*)',
+  to: '(.*)',
+  in: (done) => {
+    const container = document.querySelector('#swup');
+    container.style.opacity = 0;
+    gsap.to(container, { opacity: 1, duration: 0.5, onComplete: done });
+  },
+  out: (done) => {
+    const container = document.querySelector('#swup');
+    container.style.opacity = 1;
+    gsap.to(container, { opacity: 0, duration: 0.5, onComplete: done });
   }
-];
+}
+```
 
-const swup = new Swup({
-  plugins: [new SwupJsPlugin(options)]
-});
+### anime.js
+
+```js
+{
+  from: '(.*)',
+  to: '(.*)',
+  in: (done) => {
+    const container = document.querySelector('#swup');
+    container.style.opacity = 0;
+    anime({ targets: container, opacity: 1, duration: 500, complete: done });
+  },
+  out: (done) => {
+    const container = document.querySelector('#swup');
+    container.style.opacity = 1;
+    anime({ targets: container, opacity: 0, duration: 500, complete: done });
+  }
+}
 ```
 
 ## Choosing the animation
@@ -122,17 +153,17 @@ const swup = new Swup({
 As mentioned above, the animation is chosen based on the `from` and `to` properties of the animation object.
 Those properties can take several forms:
 
-- A String (matching a route exactly).
-- A Regex.
-- A Path route definition which you may know from things like [Express](https://expressjs.com/) (eg. `/foo/:bar`). The [Path-to-RegExp](https://github.com/pillarjs/path-to-regexp) library is used for this purpose, so refer to their documentation.
-- A String of custom transitions (taken from the `data-swup-transition` attribute of the clicked link).
+- a string (matching a route exactly)
+- a regular expression
+- A route pattern like `/foo/:bar`) parsed by [path-to-regexp](https://github.com/pillarjs/path-to-regexp)
+- a custom transition name taken from the `data-swup-transition` attribute of the clicked link
 
 The most fitting route is always chosen.
 Keep in mind, that two routes can be evaluated as "same fit".
 In this case, the later one defined in the options is used, so usually you would like to define the more specific routes later.
 See the example below for more info.
 
-```javascript
+```js
 [
   // animation 1
   { from: '(.*)', to: '(.*)' },
