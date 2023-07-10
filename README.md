@@ -1,8 +1,8 @@
 # Swup JS Plugin
 
-A [swup](https://swup.js.org) plugin for managing transitions in JS.
+A [swup](https://swup.js.org) plugin for managing animations in JS.
 
-- Use JavaScript for timing and animations instead of CSS
+- Use JavaScript for timing animations instead of CSS
 - Successor to the deprecated [swupjs](https://github.com/swup/swupjs) library
 
 ## Installation
