@@ -34,11 +34,11 @@ export default class SwupJsPlugin extends Plugin {
 	}
 
 	mount() {
-		this.swup.hooks.replace('awaitAnimation', this.awaitAnimation);
+		this.swup.hooks.replace('animation:await', this.awaitAnimation);
 	}
 
 	unmount() {
-		this.swup.hooks.off('awaitAnimation', this.awaitAnimation);
+		this.swup.hooks.off('animation:await', this.awaitAnimation);
 	}
 
 	// Compile path patterns to match functions and transitions
