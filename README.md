@@ -59,7 +59,7 @@ This is also the animation object that swup will fall-back to in case no other m
 animation object is found.
 
 Animations are chosen based on the `from` and `to` properties of the object, which are
-compared against the current page transition (urls of current and next page).
+compared against the current visit (urls of current and next page).
 Learn more on [choosing the animation](#choosing-the-animation) below.
 
 ## Animation function
@@ -85,13 +85,13 @@ out: (done) => {
 
 ### Data object
 
-The second parameter is an object that contains some useful data, like the transition
+The second parameter is an object that contains some useful data, like the visit
 object (containing actual before/after routes), the `from` and `to` parameters of the
-animation object, and the result of executing the Regex with the routes (`array`).
+animation object, and the route params.
 
 ```js
 {
-  context: { /* */ }, // swup global context object
+  visit: { /* */ }, // swup global visit object
   direction: 'in',
   from: {
     url: '/',
@@ -156,7 +156,7 @@ Those properties can take several forms:
 - a string (matching a route exactly)
 - a regular expression
 - A route pattern like `/foo/:bar`) parsed by [path-to-regexp](https://github.com/pillarjs/path-to-regexp)
-- a custom transition name taken from the `data-swup-transition` attribute of the clicked link
+- a custom animation name taken from the `data-swup-animation` attribute of the clicked link
 
 The most fitting route is always chosen.
 Keep in mind, that two routes can be evaluated as "same fit".
@@ -178,7 +178,7 @@ See the example below for more info.
   { from: '/', to: '/post' },
 
   // animation 5
-  { from: '/', to: 'custom-transition' }
+  { from: '/', to: 'custom' }
 ];
 ```
 
@@ -186,4 +186,4 @@ See the example below for more info.
 - from `/` to `/posting` → animation **2**
 - from `/` to `/post/12` → animation **3**
 - from `/` to `/some-route` → animation **1**
-- from `/` to `/post` with click having `data-swup-transition="custom-transition"` → animation **5**
+- from `/` to `/post` with click having `data-swup-animation="custom"` → animation **5**

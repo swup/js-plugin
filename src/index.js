@@ -14,31 +14,24 @@ export default class SwupJsPlugin extends Plugin {
 				out: (next) => next(),
 				in: (next) => next()
 			}
-		],
-		matchOptions: {}
+		]
 	};
 
 	animations = [];
 	currentAnimation = null;
 
 	constructor(options = {}) {
-		super();
-
 		// Backward compatibility
 		if (Array.isArray(options)) {
 			options = { animations: options };
 		}
 		this.options = { ...this.defaults, ...options };
 		this.animations = this.compileAnimations();
-		this.awaitAnimation = this.awaitAnimation.bind(this);
 	}
 
 	mount() {
-		this.swup.hooks.replace('animation:await', this.awaitAnimation);
-	}
-
-	unmount() {
-		this.swup.hooks.off('animation:await', this.awaitAnimation);
+		this.replace('animation:in:await', this.awaitInAnimation);
+		this.replace('animation:out:await', this.awaitOutAnimation);
 	}
 
 	// Compile path patterns to match functions and transitions
@@ -50,25 +43,32 @@ export default class SwupJsPlugin extends Plugin {
 		});
 	}
 
-	awaitAnimation = async (context, { direction }) => {
-		const animation = this.getBestAnimationMatch(context, direction);
-		await this.createAnimationPromise(animation, context, direction);
-	};
+	async awaitInAnimation(visit, { skip }) {
+		if (skip) return;
+		const animation = this.getBestAnimationMatch(visit, 'in');
+		await this.createAnimationPromise(animation, visit, 'in');
+	}
 
-	createAnimationPromise = (animation, context, direction) => {
+	async awaitOutAnimation(visit, { skip }) {
+		if (skip) return;
+		const animation = this.getBestAnimationMatch(visit, 'out');
+		await this.createAnimationPromise(animation, visit, 'out');
+	}
+
+	createAnimationPromise(animation, visit, direction) {
 		if (!(animation && animation[direction])) {
 			console.warn('No animation found');
 			return Promise.resolve();
 		}
 
-		const from = context.from.url;
-		const to = context.to.url;
+		const from = visit.from.url;
+		const to = visit.to.url;
 
 		const matchFrom = animation.matchesFrom(from);
 		const matchTo = animation.matchesTo(to);
 
 		const data = {
-			context,
+			visit,
 			direction,
 			from: {
 				url: from,
@@ -82,12 +82,10 @@ export default class SwupJsPlugin extends Plugin {
 			}
 		};
 
-		return new Promise((resolve) => {
-			animation[direction](resolve, data);
-		});
-	};
+		return new Promise((resolve) => animation[direction](resolve, data));
+	}
 
-	getBestAnimationMatch = (context, direction) => {
+	getBestAnimationMatch(visit, direction) {
 		// already saved from out animation
 		if (direction === 'in') {
 			return this.currentAnimation;
@@ -95,7 +93,7 @@ export default class SwupJsPlugin extends Plugin {
 
 		let topRating = 0;
 		const animation = this.animations.reduce((bestMatch, animation) => {
-			const rating = this.rateAnimation(context, animation);
+			const rating = this.rateAnimation(visit, animation);
 			if (rating >= topRating) {
 				topRating = rating;
 				return animation;
@@ -108,10 +106,10 @@ export default class SwupJsPlugin extends Plugin {
 		return animation;
 	};
 
-	rateAnimation = (context, animation) => {
-		const from = context.from.url;
-		const to = context.to.url;
-		const custom = context.transition.name;
+	rateAnimation = (visit, animation) => {
+		const from = visit.from.url;
+		const to = visit.to.url;
+		const name = visit.animation.name;
 
 		let rating = 0;
 
@@ -125,8 +123,8 @@ export default class SwupJsPlugin extends Plugin {
 			rating += 1;
 		}
 
-		// beat all others if custom parameter fits
-		if (fromMatched && animation.to === custom) {
+		// beat all others if custom name fits
+		if (fromMatched && animation.to === name) {
 			rating += 2;
 		}
 
