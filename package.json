@@ -17,7 +17,7 @@
     "dev": "swup-plugin dev",
     "lint": "swup-plugin lint",
     "format": "swup-plugin format",
-    "prepublish": "npm run build"
+    "prepublishOnly": "npm run build"
   },
   "author": {
     "name": "Georgy Marchuk",
@@ -37,7 +37,7 @@
     "url": "https://github.com/swup/js-plugin.git"
   },
   "dependencies": {
-    "@swup/plugin": "^2.0.0"
+    "@swup/plugin": "^3.0.0"
   },
   "peerDependencies": {
     "swup": "^4.0.0"
