@@ -18,7 +18,6 @@ export default class SwupJsPlugin extends Plugin {
 	};
 
 	animations = [];
-	currentAnimation = null;
 
 	constructor(options = {}) {
 		// Backward compatibility
@@ -45,13 +44,13 @@ export default class SwupJsPlugin extends Plugin {
 
 	async awaitInAnimation(visit, { skip }) {
 		if (skip) return;
-		const animation = this.getBestAnimationMatch(visit, 'in');
+		const animation = this.getBestAnimationMatch(visit);
 		await this.createAnimationPromise(animation, visit, 'in');
 	}
 
 	async awaitOutAnimation(visit, { skip }) {
 		if (skip) return;
-		const animation = this.getBestAnimationMatch(visit, 'out');
+		const animation = this.getBestAnimationMatch(visit);
 		await this.createAnimationPromise(animation, visit, 'out');
 	}
 
@@ -90,14 +89,10 @@ export default class SwupJsPlugin extends Plugin {
 		});
 	}
 
-	getBestAnimationMatch(visit, direction) {
-		// already saved from out animation
-		if (direction === 'in') {
-			return this.currentAnimation;
-		}
-
+	getBestAnimationMatch(visit) {
 		let topRating = 0;
-		const animation = this.animations.reduce((bestMatch, animation) => {
+
+		return this.animations.reduce((bestMatch, animation) => {
 			const rating = this.rateAnimation(visit, animation);
 			if (rating >= topRating) {
 				topRating = rating;
@@ -106,12 +101,9 @@ export default class SwupJsPlugin extends Plugin {
 				return bestMatch;
 			}
 		}, null);
+	}
 
-		this.currentAnimation = animation;
-		return animation;
-	};
-
-	rateAnimation = (visit, animation) => {
+	rateAnimation(visit, animation) {
 		const from = visit.from.url;
 		const to = visit.to.url;
 		const name = visit.animation.name;
@@ -134,5 +126,5 @@ export default class SwupJsPlugin extends Plugin {
 		}
 
 		return rating;
-	};
+	}
 }
