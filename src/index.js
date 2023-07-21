@@ -58,27 +58,25 @@ export default class SwupJsPlugin extends Plugin {
 	}
 
 	createAnimationPromise(animation, visit, direction) {
-		if (!(animation && animation[direction])) {
+		const animationFn = animation?.[direction];
+		if (!animationFn) {
 			console.warn('No animation found');
 			return Promise.resolve();
 		}
 
-		const from = visit.from.url;
-		const to = visit.to.url;
-
-		const matchFrom = animation.matchesFrom(from);
-		const matchTo = animation.matchesTo(to);
+		const matchFrom = animation.matchesFrom(visit.from.url);
+		const matchTo = animation.matchesTo(visit.to.url);
 
 		const data = {
 			visit,
 			direction,
 			from: {
-				url: from,
+				url: visit.from.url,
 				pattern: animation.from,
 				params: matchFrom?.params
 			},
 			to: {
-				url: to,
+				url: visit.to.url,
 				pattern: animation.to,
 				params: matchTo?.params
 			}
