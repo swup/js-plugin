@@ -1,5 +1,5 @@
 import Plugin from '@swup/plugin';
-import { matchPath } from 'swup';
+import { matchPath, isPromise } from 'swup';
 
 export default class SwupJsPlugin extends Plugin {
 	name = 'SwupJsPlugin';
@@ -82,7 +82,12 @@ export default class SwupJsPlugin extends Plugin {
 			}
 		};
 
-		return new Promise((resolve) => animation[direction](resolve, data));
+		return new Promise((resolve) => {
+			const result = animationFn(resolve, data);
+			if (isPromise(result)) {
+				result.then(resolve);
+			}
+		});
 	}
 
 	getBestAnimationMatch(visit, direction) {
