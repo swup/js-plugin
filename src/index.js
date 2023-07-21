@@ -32,8 +32,8 @@ export default class SwupJsPlugin extends Plugin {
 	}
 
 	mount() {
-		this.replace('animation:in:await', this.awaitInAnimation);
-		this.replace('animation:out:await', this.awaitOutAnimation);
+		this.replace('animation:in:await', this.awaitInAnimation, { priority: -1 });
+		this.replace('animation:out:await', this.awaitOutAnimation, { priority: -1 });
 	}
 
 	// Compile path patterns to match functions and transitions
