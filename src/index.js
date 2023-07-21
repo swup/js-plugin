@@ -20,10 +20,13 @@ export default class SwupJsPlugin extends Plugin {
 	animations = [];
 
 	constructor(options = {}) {
+		super();
+
 		// Backward compatibility
 		if (Array.isArray(options)) {
 			options = { animations: options };
 		}
+
 		this.options = { ...this.defaults, ...options };
 		this.animations = this.compileAnimations();
 	}
