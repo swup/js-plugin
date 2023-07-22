@@ -55,8 +55,7 @@ the animation being executed after the content is replaced:
 }
 ```
 
-This is also the animation object that swup will fall-back to in case no other matching
-animation object is found.
+This is also the fallback animation in case no other matching animations were found.
 
 Animations are chosen based on the `from` and `to` properties of the object, which are
 compared against the current visit (urls of current and next page).
@@ -64,18 +63,22 @@ Learn more on [choosing the animation](#choosing-the-animation) below.
 
 ## Animation function
 
-The animation function receives two parameters: a `done` function and a data object.
+The animation function is executed for each corresponding animation phase. Inside the animation
+function, you manage the animation yourself and signal when it has finished. It receives two
+arguments: a `done` function and a `data` object.
 
-### `done()` function
+```js
+out: (done, data) => {
+  // Signal the end of the animation by calling done()
+  // Access info about the animation inside the data argument
+}
+```
 
-The `done()` function must be called once and serves as an indicator that the animation
-is done and swup can proceed with replacing the content.
-In a real world example, `done()` would be used as a callback of the animation library.
-By default no animation is being executed and `done()` is called right away.
+### Signaling the end of an animation
 
-In the example below, the `done` function is called after two seconds,
-which means that swup would wait at least two seconds (or any time necessary
-to load the new page content), before continuing to replace the content.
+Calling the `done()` function signals to swup that the animation has finished and it can proceed
+to the next step: replacing the content or finishing the visit. You can pass along the `done()`
+function as a callback to your animation library. The example below will wait for two seconds before replacing the content.
 
 ```js
 out: (done) => {
@@ -83,9 +86,29 @@ out: (done) => {
 }
 ```
 
+#### Promises and async/await
+
+If your animation library returns Promises, you can also return the Promise directly from your
+animation function. Swup will consider the animation to be finished when the Promise resolves.
+The `done` function is then no longer required.
+
+```js
+out: () => {
+  return myAnimationLibrary.animate(/* */).then(() => {});
+}
+```
+
+This also allows `async/await` syntax for convenience.
+
+```js
+out: async () => {
+  await myAnimationLibrary.animate(/* */);
+}
+```
+
 ### Data object
 
-The second parameter is an object that contains some useful data, like the visit
+The second parameter is an object that contains useful data about the animation, such as the visit
 object (containing actual before/after routes), the `from` and `to` parameters of the
 animation object, and the route params.
 
