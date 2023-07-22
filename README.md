@@ -133,6 +133,23 @@ animation object, and the route params.
 
 Basic usage examples for a fade transition implemented in popular animation libraries:
 
+### [Web Animations API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API)
+
+```js
+{
+  from: '(.*)',
+  to: '(.*)',
+  in: async () => {
+    const container = document.querySelector('#swup');
+    await container.animate([{ opacity: 0 }, { opacity: 1 }], 500).finished;
+  },
+  out: async () => {
+    const container = document.querySelector('#swup');
+    await container.animate([{ opacity: 1 }, { opacity: 0 }], 500).finished;
+  }
+}
+```
+
 ### [GSAP](https://greensock.com/gsap/)
 
 ```js
