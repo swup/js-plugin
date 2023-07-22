@@ -4,6 +4,7 @@
 
 ## [3.0.0] - 2023-07
 
+- Allow returning Promises and async/await animation functions
 - Update for swup 4 compatibility
 
 ## [2.0.0] - 2023-03-13
