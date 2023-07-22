@@ -11,8 +11,8 @@ export default class SwupJsPlugin extends Plugin {
 			{
 				from: '(.*)',
 				to: '(.*)',
-				out: (next) => next(),
-				in: (next) => next()
+				out: (done) => done(),
+				in: (done) => done()
 			}
 		]
 	};
