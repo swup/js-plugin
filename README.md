@@ -131,7 +131,7 @@ animation object, and the route params.
 
 ## Examples
 
-Basic usage with animation libraries looks like this:
+Basic usage examples for a fade transition implemented in popular animation libraries:
 
 ### [GSAP](https://greensock.com/gsap/)
 
@@ -139,15 +139,15 @@ Basic usage with animation libraries looks like this:
 {
   from: '(.*)',
   to: '(.*)',
-  in: (done) => {
-    const container = document.querySelector('#swup');
-    container.style.opacity = 0;
-    gsap.to(container, { opacity: 1, duration: 0.5, onComplete: done });
-  },
   out: (done) => {
     const container = document.querySelector('#swup');
     container.style.opacity = 1;
     gsap.to(container, { opacity: 0, duration: 0.5, onComplete: done });
+  },
+  in: (done) => {
+    const container = document.querySelector('#swup');
+    container.style.opacity = 0;
+    gsap.to(container, { opacity: 1, duration: 0.5, onComplete: done });
   }
 }
 ```
@@ -158,15 +158,15 @@ Basic usage with animation libraries looks like this:
 {
   from: '(.*)',
   to: '(.*)',
-  in: (done) => {
-    const container = document.querySelector('#swup');
-    container.style.opacity = 0;
-    anime({ targets: container, opacity: 1, duration: 500, complete: done });
-  },
   out: (done) => {
     const container = document.querySelector('#swup');
     container.style.opacity = 1;
     anime({ targets: container, opacity: 0, duration: 500, complete: done });
+  },
+  in: (done) => {
+    const container = document.querySelector('#swup');
+    container.style.opacity = 0;
+    anime({ targets: container, opacity: 1, duration: 500, complete: done });
   }
 }
 ```
