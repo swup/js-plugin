@@ -93,7 +93,7 @@ export default class SwupJsPlugin extends Plugin {
 	getBestAnimationMatch(visit) {
 		let topRating = 0;
 
-		return this.animations.reduce((bestMatch, animation) => {
+		return this.animations.reduceRight((bestMatch, animation) => {
 			const rating = this.rateAnimation(visit, animation);
 			if (rating >= topRating) {
 				topRating = rating;

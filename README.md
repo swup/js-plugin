@@ -200,30 +200,26 @@ Those properties can take several forms:
 
 The most fitting route is always chosen.
 Keep in mind, that two routes can be evaluated as "same fit".
-In this case, the later one defined in the options is used, so usually you would like to define the more specific routes later.
+In this case, the first one defined in the options is used, so usually you would like to define the more specific routes first.
 See the example below for more info.
 
 ```js
 [
-  // animation 1
-  { from: '(.*)', to: '(.*)' },
-
+    // animation 1
+  { from: '/', to: 'custom' },
   // animation 2
-  { from: '/', to: /pos(.*)/ },
-
+  { from: '/', to: '/post' },
   // animation 3
   { from: '/', to: '/post/:id' },
-
   // animation 4
-  { from: '/', to: '/post' },
-
+  { from: '/', to: /pos(.*)/ },
   // animation 5
-  { from: '/', to: 'custom' }
+  { from: '(.*)', to: '(.*)' },
 ];
 ```
 
-- from `/` to `/post` → animation **4**
-- from `/` to `/posting` → animation **2**
+- from `/` to `/post` → animation **2**
+- from `/` to `/posting` → animation **4**
 - from `/` to `/post/12` → animation **3**
-- from `/` to `/some-route` → animation **1**
-- from `/` to `/post` with click having `data-swup-animation="custom"` → animation **5**
+- from `/` to `/some-route` → animation **5**
+- from `/` to `/post` with `data-swup-animation="custom"` → animation **1**
