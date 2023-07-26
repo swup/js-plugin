@@ -2,7 +2,7 @@
   "name": "@swup/js-plugin",
   "amdName": "SwupJsPlugin",
   "version": "2.0.0",
-  "description": "Swup JS plugin. (swupjs)",
+  "description": "A swup plugin for managing animations in JS",
   "type": "module",
   "source": "src/index.js",
   "main": "./dist/index.cjs",
@@ -17,7 +17,7 @@
     "dev": "swup-plugin dev",
     "lint": "swup-plugin lint",
     "format": "swup-plugin format",
-    "prepublish": "npm run build"
+    "prepublishOnly": "npm run build"
   },
   "author": {
     "name": "Georgy Marchuk",
@@ -37,11 +37,10 @@
     "url": "https://github.com/swup/js-plugin.git"
   },
   "dependencies": {
-    "@swup/plugin": "^2.0.0",
-    "path-to-regexp": "^3.0.0"
+    "@swup/plugin": "^3.0.0"
   },
   "peerDependencies": {
-    "swup": "^3.0.0"
+    "swup": "^4.0.0"
   },
   "browserslist": [
     "extends @swup/browserslist-config"

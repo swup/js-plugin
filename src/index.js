@@ -1,124 +1,131 @@
 import Plugin from '@swup/plugin';
-import pathToRegexp from 'path-to-regexp';
+import { matchPath, isPromise } from 'swup';
 
-export default class JsPlugin extends Plugin {
-	name = 'JsPlugin';
+export default class SwupJsPlugin extends Plugin {
+	name = 'SwupJsPlugin';
 
-	currentAnimation = null;
+	requires = { swup: '>=4' };
 
-	constructor(options = {}) {
-		super();
-		const defaultOptions = [
+	defaults = {
+		animations: [
 			{
 				from: '(.*)',
 				to: '(.*)',
-				out: (next) => next(),
-				in: (next) => next()
+				out: (done) => done(),
+				in: (done) => done()
 			}
-		];
+		]
+	};
 
-		this.options = {
-			...defaultOptions,
-			...options
-		};
+	animations = [];
 
-		this.generateRegex();
+	constructor(options = {}) {
+		super();
+
+		// Backward compatibility
+		if (Array.isArray(options)) {
+			options = { animations: options };
+		}
+
+		this.options = { ...this.defaults, ...options };
+		this.animations = this.compileAnimations();
 	}
 
 	mount() {
-		const swup = this.swup;
-
-		swup._getAnimationPromises = swup.getAnimationPromises;
-		swup.getAnimationPromises = this.getAnimationPromises;
+		this.replace('animation:in:await', this.awaitInAnimation, { priority: -1 });
+		this.replace('animation:out:await', this.awaitOutAnimation, { priority: -1 });
 	}
 
-	unmount() {
-		const swup = this.swup;
-
-		swup.getAnimationPromises = swup._getAnimationPromises;
-		swup._getAnimationPromises = null;
-	}
-
-	generateRegex() {
-		const isRegex = (str) => str instanceof RegExp;
-
-		this.options = Object.keys(this.options).map((key) => {
-			return {
-				...this.options[key],
-				regFrom: isRegex(this.options[key].from)
-					? this.options[key].from
-					: pathToRegexp(this.options[key].from),
-				regTo: isRegex(this.options[key].to)
-					? this.options[key].to
-					: pathToRegexp(this.options[key].to)
-			};
+	// Compile path patterns to match functions and transitions
+	compileAnimations() {
+		return this.options.animations.map((animation) => {
+			const matchesFrom = matchPath(animation.from, this.options.matchOptions);
+			const matchesTo = matchPath(animation.to, this.options.matchOptions);
+			return { ...animation, matchesFrom, matchesTo };
 		});
 	}
 
-	getAnimationPromises = (type) => {
-		const animationIndex = this.getAnimationIndex(type);
-		return [this.createAnimationPromise(animationIndex, type)];
-	};
+	async awaitInAnimation(visit, { skip }) {
+		if (skip) return;
+		const animation = this.getBestAnimationMatch(visit);
+		await this.createAnimationPromise(animation, visit, 'in');
+	}
 
-	createAnimationPromise = (index, type) => {
-		const currentTransitionRoutes = this.swup.transition;
-		const animation = this.options[index];
+	async awaitOutAnimation(visit, { skip }) {
+		if (skip) return;
+		const animation = this.getBestAnimationMatch(visit);
+		await this.createAnimationPromise(animation, visit, 'out');
+	}
 
-		if (!(animation && animation[type])) {
+	createAnimationPromise(animation, visit, direction) {
+		const animationFn = animation?.[direction];
+		if (!animationFn) {
 			console.warn('No animation found');
 			return Promise.resolve();
 		}
 
+		const matchFrom = animation.matchesFrom(visit.from.url);
+		const matchTo = animation.matchesTo(visit.to.url);
+
+		const data = {
+			visit,
+			direction,
+			from: {
+				url: visit.from.url,
+				pattern: animation.from,
+				params: matchFrom?.params
+			},
+			to: {
+				url: visit.to.url,
+				pattern: animation.to,
+				params: matchTo?.params
+			}
+		};
+
 		return new Promise((resolve) => {
-			animation[type](resolve, {
-				paramsFrom: animation.regFrom.exec(currentTransitionRoutes.from),
-				paramsTo: animation.regTo.exec(currentTransitionRoutes.to),
-				transition: currentTransitionRoutes,
-				from: animation.from,
-				to: animation.to
-			});
-		});
-	};
-
-	getAnimationIndex = (type) => {
-		// already saved from out animation
-		if (type === 'in') {
-			return this.currentAnimation;
-		}
-
-		const animations = this.options;
-		let animationIndex = 0;
-		let topRating = 0;
-
-		Object.keys(animations).forEach((key, index) => {
-			const animation = animations[key];
-			const rating = this.rateAnimation(animation);
-
-			if (rating >= topRating) {
-				animationIndex = index;
-				topRating = rating;
+			const result = animationFn(resolve, data);
+			if (isPromise(result)) {
+				result.then(resolve);
 			}
 		});
+	}
 
-		this.currentAnimation = animationIndex;
-		return this.currentAnimation;
-	};
+	getBestAnimationMatch(visit) {
+		let topRating = 0;
 
-	rateAnimation = (animation) => {
-		const currentTransitionRoutes = this.swup.transition;
+		return this.animations.reduceRight((bestMatch, animation) => {
+			const rating = this.rateAnimation(visit, animation);
+			if (rating >= topRating) {
+				topRating = rating;
+				return animation;
+			} else {
+				return bestMatch;
+			}
+		}, null);
+	}
+
+	rateAnimation(visit, animation) {
+		const from = visit.from.url;
+		const to = visit.to.url;
+		const name = visit.animation.name;
+
 		let rating = 0;
 
-		// run regex
-		const fromMatched = animation.regFrom.test(currentTransitionRoutes.from);
-		const toMatched = animation.regTo.test(currentTransitionRoutes.to);
+		// check if route patterns match
+		const fromMatched = animation.matchesFrom(from);
+		const toMatched = animation.matchesTo(to);
+		if (fromMatched) {
+			rating += 1;
+		}
+		if (toMatched) {
+			rating += 1;
+		}
 
-		// check if regex passes
-		rating += fromMatched ? 1 : 0;
-		rating += toMatched ? 1 : 0;
-
-		// beat all other if custom parameter fits
-		rating += fromMatched && animation.to === currentTransitionRoutes.custom ? 2 : 0;
+		// beat all others if custom name fits
+		if (fromMatched && animation.to === name) {
+			rating += 2;
+		}
 
 		return rating;
-	};
+	}
 }
