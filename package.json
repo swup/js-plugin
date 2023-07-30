@@ -1,7 +1,7 @@
 {
   "name": "@swup/js-plugin",
   "amdName": "SwupJsPlugin",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "A swup plugin for managing animations in JS",
   "type": "module",
   "source": "src/index.ts",
