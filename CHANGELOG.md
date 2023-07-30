@@ -2,6 +2,10 @@
 
 <!-- ## [Unreleased] -->
 
+## [3.1.0] - 2023-07-30
+
+- Port to TypeScript
+
 ## [3.0.0] - 2023-07-26
 
 - Allow returning Promises and async/await animation functions
@@ -37,8 +41,9 @@
 
 - Initial release
 
-[Unreleased]: https://github.com/swup/js-plugin/compare/3.0.0...HEAD
+[Unreleased]: https://github.com/swup/js-plugin/compare/3.1.0...HEAD
 
+[3.1.0]: https://github.com/swup/js-plugin/releases/tag/3.1.0
 [3.0.0]: https://github.com/swup/js-plugin/releases/tag/3.0.0
 [2.0.0]: https://github.com/swup/js-plugin/releases/tag/2.0.0
 [1.0.5]: https://github.com/swup/js-plugin/releases/tag/1.0.5
