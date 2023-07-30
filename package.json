@@ -1,13 +1,14 @@
 {
   "name": "@swup/js-plugin",
   "amdName": "SwupJsPlugin",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "A swup plugin for managing animations in JS",
   "type": "module",
   "source": "src/index.ts",
   "main": "./dist/index.cjs",
   "module": "./dist/index.module.js",
   "unpkg": "./dist/index.umd.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -15,6 +16,9 @@
       "require": "./dist/index.cjs"
     }
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "swup-plugin build",
     "dev": "swup-plugin dev",
