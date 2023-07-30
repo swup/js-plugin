@@ -1,6 +1,53 @@
 import Plugin from '@swup/plugin';
 import { matchPath, isPromise, Visit, Handler } from 'swup';
 
+type RequireKeys<T, K extends keyof T> = Partial<T> & Pick<T, K>;
+
+type Animation = {
+	/** The path pattern to match the current url against. */
+	from: string;
+	/** The path pattern to match the next url against. */
+	to: string;
+	/** The function to call when the animation is triggered. */
+	out: (done: () => void, data: AnimationData) => void | Promise<void>;
+	/** The function to call when the animation is triggered. */
+	in: (done: () => void, data: AnimationData) => void | Promise<void>;
+};
+
+type CompiledAnimation = Animation & {
+	/** Match function to check if the `from` pattern matches a given URL */
+	matchesFrom: MatchFunction;
+	/** Match function to check if the `to` pattern matches a given URL */
+	matchesTo: MatchFunction;
+};
+
+type AnimationData = {
+	visit: Visit;
+	direction: 'in' | 'out';
+	from: {
+		url: string;
+		pattern: string;
+		params: object;
+	};
+	to: {
+		url: string;
+		pattern: string;
+		params: object;
+	};
+};
+
+type MatchOptions = Parameters<typeof matchPath>[1];
+type MatchFunction = ReturnType<typeof matchPath>;
+
+type Options = {
+	/** The selector for matching the main content area of the page. */
+	animations: Animation[];
+	/** Options for matching paths. Directly passed into `path-to-regexp`. */
+	matchOptions: MatchOptions;
+};
+
+type InitOptions = RequireKeys<Options, 'animations'>;
+
 export default class SwupJsPlugin extends Plugin {
 	name = 'SwupJsPlugin';
 
