@@ -4,14 +4,17 @@
   "version": "3.0.0",
   "description": "A swup plugin for managing animations in JS",
   "type": "module",
-  "source": "src/index.js",
+  "source": "src/index.ts",
   "main": "./dist/index.cjs",
   "module": "./dist/index.module.js",
-  "exports": "./dist/index.modern.js",
   "unpkg": "./dist/index.umd.js",
-  "files": [
-    "dist"
-  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.modern.js",
+      "require": "./dist/index.cjs"
+    }
+  },
   "scripts": {
     "build": "swup-plugin build",
     "dev": "swup-plugin dev",

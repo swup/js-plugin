@@ -1,12 +1,12 @@
 import Plugin from '@swup/plugin';
-import { matchPath, isPromise } from 'swup';
+import { matchPath, isPromise, Visit, Handler } from 'swup';
 
 export default class SwupJsPlugin extends Plugin {
 	name = 'SwupJsPlugin';
 
 	requires = { swup: '>=4' };
 
-	defaults = {
+	defaults: Options = {
 		animations: [
 			{
 				from: '(.*)',
@@ -14,17 +14,19 @@ export default class SwupJsPlugin extends Plugin {
 				out: (done) => done(),
 				in: (done) => done()
 			}
-		]
+		],
+		matchOptions: {}
 	};
+	options: Options;
 
-	animations = [];
+	animations: CompiledAnimation[] = [];
 
-	constructor(options = {}) {
+	constructor(options: InitOptions) {
 		super();
 
 		// Backward compatibility
 		if (Array.isArray(options)) {
-			options = { animations: options };
+			options = { animations: options as Animation[] };
 		}
 
 		this.options = { ...this.defaults, ...options };
@@ -37,35 +39,42 @@ export default class SwupJsPlugin extends Plugin {
 	}
 
 	// Compile path patterns to match functions and transitions
-	compileAnimations() {
-		return this.options.animations.map((animation) => {
+	compileAnimations(): CompiledAnimation[] {
+		return this.options.animations.map((animation): CompiledAnimation => {
 			const matchesFrom = matchPath(animation.from, this.options.matchOptions);
 			const matchesTo = matchPath(animation.to, this.options.matchOptions);
 			return { ...animation, matchesFrom, matchesTo };
 		});
 	}
 
-	async awaitInAnimation(visit, { skip }) {
+	awaitInAnimation: Handler<'animation:in:await'> = async (visit, { skip }) => {
 		if (skip) return;
 		const animation = this.getBestAnimationMatch(visit);
 		await this.createAnimationPromise(animation, visit, 'in');
-	}
+	};
 
-	async awaitOutAnimation(visit, { skip }) {
+	awaitOutAnimation: Handler<'animation:out:await'> = async (visit, { skip }) => {
 		if (skip) return;
 		const animation = this.getBestAnimationMatch(visit);
 		await this.createAnimationPromise(animation, visit, 'out');
-	}
+	};
 
-	createAnimationPromise(animation, visit, direction) {
-		const animationFn = animation?.[direction];
-		if (!animationFn) {
+	createAnimationPromise(
+		animation: CompiledAnimation | null,
+		visit: Visit,
+		direction: 'in' | 'out'
+	): Promise<void> {
+		const animationFn = animation ? animation[direction] : null;
+		if (!animation || !animationFn) {
 			console.warn('No animation found');
 			return Promise.resolve();
 		}
 
 		const matchFrom = animation.matchesFrom(visit.from.url);
-		const matchTo = animation.matchesTo(visit.to.url);
+		const matchTo = animation.matchesTo(visit.to.url!);
+
+		const paramsFrom = matchFrom ? matchFrom.params : {};
+		const paramsTo = matchTo ? matchTo.params : {};
 
 		const data = {
 			visit,
@@ -73,40 +82,45 @@ export default class SwupJsPlugin extends Plugin {
 			from: {
 				url: visit.from.url,
 				pattern: animation.from,
-				params: matchFrom?.params
+				params: paramsFrom
 			},
 			to: {
-				url: visit.to.url,
+				url: visit.to.url!,
 				pattern: animation.to,
-				params: matchTo?.params
+				params: paramsTo
 			}
 		};
 
 		return new Promise((resolve) => {
-			const result = animationFn(resolve, data);
+			const result = animationFn(() => resolve(), data);
 			if (isPromise(result)) {
 				result.then(resolve);
 			}
 		});
 	}
 
-	getBestAnimationMatch(visit) {
+	getBestAnimationMatch(visit: Visit): CompiledAnimation | null {
 		let topRating = 0;
 
-		return this.animations.reduceRight((bestMatch, animation) => {
-			const rating = this.rateAnimation(visit, animation);
-			if (rating >= topRating) {
-				topRating = rating;
-				return animation;
-			} else {
-				return bestMatch;
-			}
-		}, null);
+		const animation: CompiledAnimation | null = this.animations.reduceRight(
+			(bestMatch, animation) => {
+				const rating = this.rateAnimation(visit, animation);
+				if (rating >= topRating) {
+					topRating = rating;
+					return animation;
+				} else {
+					return bestMatch;
+				}
+			},
+			null as CompiledAnimation | null
+		);
+
+		return animation;
 	}
 
-	rateAnimation(visit, animation) {
+	rateAnimation(visit: Visit, animation: CompiledAnimation): number {
 		const from = visit.from.url;
-		const to = visit.to.url;
+		const to = visit.to.url!;
 		const name = visit.animation.name;
 
 		let rating = 0;
