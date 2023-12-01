@@ -171,15 +171,11 @@ Basic usage examples for a fade transition implemented in popular animation libr
 {
   from: '(.*)',
   to: '(.*)',
-  out: (done) => {
-    const container = document.querySelector('#swup');
-    container.style.opacity = 1;
-    anime({ targets: container, opacity: 0, duration: 500, complete: done });
+  out: async () => {
+    await anime({ targets: '#swup', opacity: 0, duration: 250, easing: 'linear' }).finished;
   },
-  in: (done) => {
-    const container = document.querySelector('#swup');
-    container.style.opacity = 0;
-    anime({ targets: container, opacity: 1, duration: 500, complete: done });
+  in: async () => {
+    await anime({ targets: '#swup', opacity: [0, 1], duration: 250, easing: 'linear' }).finished;
   }
 }
 ```
