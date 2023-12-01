@@ -141,11 +141,11 @@ Basic usage examples for a fade transition implemented in popular animation libr
   to: '(.*)',
   in: async () => {
     const container = document.querySelector('#swup');
-    await container.animate([{ opacity: 0 }, { opacity: 1 }], 500).finished;
+    await container.animate([{ opacity: 0 }, { opacity: 1 }], 250).finished;
   },
   out: async () => {
     const container = document.querySelector('#swup');
-    await container.animate([{ opacity: 1 }, { opacity: 0 }], 500).finished;
+    await container.animate([{ opacity: 1 }, { opacity: 0 }], 250).finished;
   }
 }
 ```
