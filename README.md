@@ -156,15 +156,11 @@ Basic usage examples for a fade transition implemented in popular animation libr
 {
   from: '(.*)',
   to: '(.*)',
-  out: (done) => {
-    const container = document.querySelector('#swup');
-    container.style.opacity = 1;
-    gsap.to(container, { opacity: 0, duration: 0.5, onComplete: done });
+  out: async () => {
+    await gsap.to('#swup', { opacity: 0, duration: 0.25 });
   },
-  in: (done) => {
-    const container = document.querySelector('#swup');
-    container.style.opacity = 0;
-    gsap.to(container, { opacity: 1, duration: 0.5, onComplete: done });
+  in: async () => {
+    await gsap.fromTo('#swup', { opacity: 0 }, { opacity: 1, duration: 0.25 });
   }
 }
 ```
