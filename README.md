@@ -141,11 +141,11 @@ Basic usage examples for a fade transition implemented in popular animation libr
   to: '(.*)',
   in: async () => {
     const container = document.querySelector('#swup');
-    await container.animate([{ opacity: 0 }, { opacity: 1 }], 500).finished;
+    await container.animate([{ opacity: 0 }, { opacity: 1 }], 250).finished;
   },
   out: async () => {
     const container = document.querySelector('#swup');
-    await container.animate([{ opacity: 1 }, { opacity: 0 }], 500).finished;
+    await container.animate([{ opacity: 1 }, { opacity: 0 }], 250).finished;
   }
 }
 ```
@@ -156,15 +156,11 @@ Basic usage examples for a fade transition implemented in popular animation libr
 {
   from: '(.*)',
   to: '(.*)',
-  out: (done) => {
-    const container = document.querySelector('#swup');
-    container.style.opacity = 1;
-    gsap.to(container, { opacity: 0, duration: 0.5, onComplete: done });
+  out: async () => {
+    await gsap.to('#swup', { opacity: 0, duration: 0.25 });
   },
-  in: (done) => {
-    const container = document.querySelector('#swup');
-    container.style.opacity = 0;
-    gsap.to(container, { opacity: 1, duration: 0.5, onComplete: done });
+  in: async () => {
+    await gsap.fromTo('#swup', { opacity: 0 }, { opacity: 1, duration: 0.25 });
   }
 }
 ```
@@ -175,15 +171,11 @@ Basic usage examples for a fade transition implemented in popular animation libr
 {
   from: '(.*)',
   to: '(.*)',
-  out: (done) => {
-    const container = document.querySelector('#swup');
-    container.style.opacity = 1;
-    anime({ targets: container, opacity: 0, duration: 500, complete: done });
+  out: async () => {
+    await anime({ targets: '#swup', opacity: 0, duration: 250, easing: 'linear' }).finished;
   },
-  in: (done) => {
-    const container = document.querySelector('#swup');
-    container.style.opacity = 0;
-    anime({ targets: container, opacity: 1, duration: 500, complete: done });
+  in: async () => {
+    await anime({ targets: '#swup', opacity: [0, 1], duration: 250, easing: 'linear' }).finished;
   }
 }
 ```
