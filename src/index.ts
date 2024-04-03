@@ -54,14 +54,16 @@ export default class SwupJsPlugin extends Plugin {
 
 	requires = { swup: '>=4' };
 
+  defaultAnimation: Animation = {
+    from: '(.*)',
+    to: '(.*)',
+    out: (done) => done(),
+    in: (done) => done()
+  };
+
 	defaults: Options = {
 		animations: [
-			{
-				from: '(.*)',
-				to: '(.*)',
-				out: (done) => done(),
-				in: (done) => done()
-			}
+			this.defaultAnimation
 		],
 		matchOptions: {}
 	};
@@ -78,6 +80,15 @@ export default class SwupJsPlugin extends Plugin {
 		}
 
 		this.options = { ...this.defaults, ...options };
+
+    // Make sure we have a fallback animation available
+    const hasDefaultAnimation = this.options.animations.some(
+      (animation) => animation.from === '(.*)' && animation.to === '(.*)'
+    );
+    if (!hasDefaultAnimation) {
+      this.options.animations.push(this.defaultAnimation);
+    }
+
 		this.animations = this.compileAnimations();
 	}
 
