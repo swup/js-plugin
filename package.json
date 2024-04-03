@@ -17,13 +17,14 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "scripts": {
-    "build": "swup-plugin build",
-    "dev": "swup-plugin dev",
-    "lint": "swup-plugin lint",
-    "format": "swup-plugin format",
+    "build": "swup package:build",
+    "dev": "swup package:dev",
+    "lint": "swup package:lint",
+    "format": "swup package:format",
     "prepublishOnly": "npm run build"
   },
   "author": {
@@ -36,6 +37,11 @@
       "name": "Rasso Hilber",
       "email": "mail@rassohilber.com",
       "url": "https://rassohilber.com"
+    },
+    {
+      "name": "Philipp Daun",
+      "email": "daun@daun.ltd",
+      "url": "https://philippdaun.net"
     }
   ],
   "license": "MIT",
@@ -44,7 +50,10 @@
     "url": "https://github.com/swup/js-plugin.git"
   },
   "dependencies": {
-    "@swup/plugin": "^3.0.0"
+    "@swup/plugin": "^4.0.0"
+  },
+  "devDependencies": {
+    "@swup/cli": "^5.0.3"
   },
   "peerDependencies": {
     "swup": "^4.0.0"
