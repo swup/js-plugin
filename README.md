@@ -65,6 +65,8 @@ Animations are chosen based on the `from` and `to` properties of the object, whi
 compared against the current visit (urls of current and next page).
 Learn more on [choosing the animation](#choosing-the-animation) below.
 
+`from` and `to` can be a string, an array of strings or a regular expression.
+
 ## Animation function
 
 The animation function is executed for each corresponding animation phase. Inside the animation
