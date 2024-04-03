@@ -1,6 +1,9 @@
 # Changelog
 
-<!-- ## [Unreleased] -->
+## [3.1.2] - 2024-04-03
+
+- Support for arrays of strings for `from` and `to`
+- Use `@swup/cli` for bundling
 
 ## [3.1.1] - 2023-07-30
 
@@ -45,7 +48,7 @@
 
 - Initial release
 
-[Unreleased]: https://github.com/swup/js-plugin/compare/3.1.1...HEAD
+[3.1.2]: https://github.com/swup/js-plugin/releases/tag/3.1.2
 [3.1.1]: https://github.com/swup/js-plugin/releases/tag/3.1.1
 [3.1.0]: https://github.com/swup/js-plugin/releases/tag/3.1.0
 [3.0.0]: https://github.com/swup/js-plugin/releases/tag/3.0.0
