@@ -30,7 +30,11 @@ To run this plugin, include an instance in the swup options.
 ```js
 const swup = new Swup({
   plugins: [
-    new SwupJsPlugin({ animations: [ /* your custom animation functions */ ] })
+    new SwupJsPlugin({
+      animations: [
+        /* your custom animation functions */
+      ]
+    })
   ]
 });
 ```
@@ -48,10 +52,10 @@ the animation being executed after the content is replaced:
     {
       from: '(.*)', // matches any route
       to: '(.*)', // matches any route
-      out: done => done(), // immediately continues
-      in: done => done() // immediately continues
+      out: (done) => done(), // immediately continues
+      in: (done) => done() // immediately continues
     }
-  ]
+  ];
 }
 ```
 
@@ -71,7 +75,7 @@ arguments: a `done` function and a `data` object.
 out: (done, data) => {
   // Signal the end of the animation by calling done()
   // Access info about the animation inside the data argument
-}
+};
 ```
 
 ### Signaling the end of an animation
@@ -83,7 +87,7 @@ function as a callback to your animation library. The example below will wait fo
 ```js
 out: (done) => {
   setTimeout(done, 2000);
-}
+};
 ```
 
 #### Promises and async/await
@@ -95,7 +99,7 @@ The `done` function is then no longer required.
 ```js
 out: () => {
   return myAnimationLibrary.animate(/* */).then(() => {});
-}
+};
 ```
 
 This also allows `async/await` syntax for convenience.
@@ -103,7 +107,7 @@ This also allows `async/await` syntax for convenience.
 ```js
 out: async () => {
   await myAnimationLibrary.animate(/* */);
-}
+};
 ```
 
 ### Data object
@@ -197,7 +201,7 @@ See the example below for more info.
 
 ```js
 [
-    // animation 1
+  // animation 1
   { from: '/', to: 'custom' },
   // animation 2
   { from: '/', to: '/post' },
@@ -206,7 +210,7 @@ See the example below for more info.
   // animation 4
   { from: '/', to: /pos(.*)/ },
   // animation 5
-  { from: '(.*)', to: '(.*)' },
+  { from: '(.*)', to: '(.*)' }
 ];
 ```
 
