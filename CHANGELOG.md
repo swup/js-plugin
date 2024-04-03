@@ -2,7 +2,8 @@
 
 ## [3.1.2] - 2024-04-03
 
-- Support for arrays of strings for `from` and `to`
+- Fix: Make sure a default animation is always applied
+- Feat: Fix type signature of `from` and `to`
 - Use `@swup/cli` for bundling
 
 ## [3.1.1] - 2023-07-30
