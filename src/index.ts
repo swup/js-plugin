@@ -1,7 +1,7 @@
 import Plugin from '@swup/plugin';
 import { matchPath, isPromise } from 'swup';
 import type { Handler, Visit } from 'swup';
-import { Animation, compileAnimations, CompiledAnimation, getBestAnimationMatch } from './animations.js';
+import { Animation, AnimationData, compileAnimations, CompiledAnimation, matchAnimation } from './animations.js';
 
 type RequireKeys<T, K extends keyof T> = Partial<T> & Pick<T, K>;
 
@@ -59,53 +59,54 @@ export default class SwupJsPlugin extends Plugin {
 
 	awaitInAnimation: Handler<'animation:in:await'> = async (visit, { skip }) => {
 		if (skip) return;
-		const animation = getBestAnimationMatch(this.animations, visit.from.url, visit.to.url, visit.animation.name);
-		await this.createAnimationPromise(animation, visit, 'in');
+		const animation = matchAnimation(this.animations, visit.from.url, visit.to.url, visit.animation.name);
+		if (animation) {
+			await this.createAnimationPromise(animation, visit, 'in');
+		}
 	};
 
 	awaitOutAnimation: Handler<'animation:out:await'> = async (visit, { skip }) => {
 		if (skip) return;
-		const animation = getBestAnimationMatch(this.animations, visit.from.url, visit.to.url, visit.animation.name);
-		await this.createAnimationPromise(animation, visit, 'out');
+		const animation = matchAnimation(this.animations, visit.from.url, visit.to.url, visit.animation.name);
+		if (animation) {
+			await this.createAnimationPromise(animation, visit, 'out');
+		}
 	};
 
-	createAnimationPromise(
-		animation: CompiledAnimation | null,
-		visit: Visit,
-		direction: 'in' | 'out'
-	): Promise<void> {
-		const animationFn = animation ? animation[direction] : null;
-		if (!animation || !animationFn) {
-			console.warn('No animation found');
+	createAnimationPromise(animation: CompiledAnimation, visit: Visit, direction: 'in' | 'out'): Promise<void> {
+		const animationFn = animation[direction];
+		if (!animationFn) {
+			console.warn(`Missing animation function for '${direction}' phase`);
 			return Promise.resolve();
 		}
 
-		const matchFrom = animation.matchesFrom(visit.from.url);
-		const matchTo = animation.matchesTo(visit.to.url!);
-
-		const paramsFrom = matchFrom ? matchFrom.params : {};
-		const paramsTo = matchTo ? matchTo.params : {};
-
-		const data = {
-			visit,
-			direction,
-			from: {
-				url: visit.from.url,
-				pattern: animation.from,
-				params: paramsFrom
-			},
-			to: {
-				url: visit.to.url!,
-				pattern: animation.to,
-				params: paramsTo
-			}
-		};
-
 		return new Promise((resolve) => {
+			const data = this.getAnimationData(animation, visit, direction);
 			const result = animationFn(() => resolve(), data);
 			if (isPromise(result)) {
 				result.then(resolve);
 			}
 		});
 	}
+
+	getAnimationData(animation: CompiledAnimation, visit: Visit, direction: 'in' | 'out'): AnimationData {
+		const matchFrom = animation.matchesFrom(visit.from.url);
+		const matchTo = animation.matchesTo(visit.to.url!);
+
+		return {
+			visit,
+			direction,
+			from: {
+				url: visit.from.url,
+				pattern: animation.from,
+				params: matchFrom ? matchFrom.params : {}
+			},
+			to: {
+				url: visit.to.url!,
+				pattern: animation.to,
+				params: matchTo ? matchTo.params : {}
+			}
+		};
+	}
+
 }

@@ -79,7 +79,7 @@ export function rateAnimation(animation: CompiledAnimation, from: string, to: st
 /**
  * Find best animation by ranking animations against each other
  */
-export function getBestAnimationMatch(animations: CompiledAnimation[], from: string, to: string, name: string | undefined): CompiledAnimation | null {
+export function matchAnimation(animations: CompiledAnimation[], from: string, to: string, name: string | undefined): CompiledAnimation | null {
 	let topRating = 0;
 
 	const animation: CompiledAnimation | null = animations.reduceRight(
