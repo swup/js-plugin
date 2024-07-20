@@ -58,7 +58,6 @@
     "@swup/cli": "^5.0.1",
     "@types/jsdom": "^21.1.4",
     "jsdom": "^24.0.0",
-    "msw": "^2.2.11",
     "vitest": "^1.2.2"
   },
   "peerDependencies": {
