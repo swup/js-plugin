@@ -20,11 +20,14 @@
     "dist"
   ],
   "scripts": {
-    "prepublishOnly": "npm run build"
     "build": "swup package:build",
     "dev": "swup package:dev",
     "lint": "swup package:lint",
     "format": "swup package:format",
+    "prepublishOnly": "npm run build",
+    "test": "npm run test:unit",
+    "test:unit": "vitest run --config ./tests/config/vitest.config.ts",
+    "test:unit:watch": "vitest --config ./tests/config/vitest.config.ts"
   },
   "author": {
     "name": "Georgy Marchuk",
@@ -48,9 +51,13 @@
   },
   "devDependencies": {
     "@swup/cli": "^5.0.1",
+    "@types/jsdom": "^21.1.4",
+    "jsdom": "^24.0.0",
+    "msw": "^2.2.11",
+    "vitest": "^1.2.2"
   },
   "peerDependencies": {
-    "swup": "^4.0.0"
+    "swup": "^4.6.0"
   },
   "browserslist": [
     "extends @swup/browserslist-config"
