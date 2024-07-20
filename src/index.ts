@@ -55,19 +55,20 @@ export default class SwupJsPlugin extends Plugin {
 	requires = { swup: '>=4' };
 
 	defaults: Options = {
-		animations: [
-			{
-				from: '(.*)',
-				to: '(.*)',
-				out: (done) => done(),
-				in: (done) => done()
-			}
-		],
+		animations: [],
 		matchOptions: {}
 	};
+
 	options: Options;
 
 	animations: CompiledAnimation[] = [];
+
+	defaultAnimation: Animation = {
+    from: '(.*)',
+    to: '(.*)',
+    out: (done) => done(),
+    in: (done) => done()
+  };
 
 	constructor(options: InitOptions) {
 		super();
@@ -78,6 +79,7 @@ export default class SwupJsPlugin extends Plugin {
 		}
 
 		this.options = { ...this.defaults, ...options };
+		this.options.animations.push(this.defaultAnimation);
 		this.animations = this.compileAnimations();
 	}
 
