@@ -2,7 +2,7 @@ import Plugin from '@swup/plugin';
 import { matchPath } from 'swup';
 import type { Handler, Visit } from 'swup';
 
-import { assembleAnimationData, compileAnimations, findAnimationForVisit, runAnimation } from './animations.js';
+import { assembleAnimationData, compileAnimations, defaultAnimation, findAnimationForVisit, runAnimation } from './animations.js';
 import type { Animation, CompiledAnimation } from './animations.js';
 
 type RequireKeys<T, K extends keyof T> = Partial<T> & Pick<T, K>;
@@ -34,13 +34,6 @@ export default class SwupJsPlugin extends Plugin {
 
 	animations: CompiledAnimation[] = [];
 
-	defaultAnimation: Animation = {
-		from: '(.*)',
-		to: '(.*)',
-		out: (done) => done(),
-		in: (done) => done()
-	};
-
 	constructor(options: InitOptions) {
 		super();
 
@@ -50,7 +43,7 @@ export default class SwupJsPlugin extends Plugin {
 		}
 
 		this.options = { ...this.defaults, ...options };
-		this.options.animations.push(this.defaultAnimation);
+		this.options.animations.push(defaultAnimation);
 		this.animations = compileAnimations(this.options.animations, this.options.matchOptions);
 	}
 

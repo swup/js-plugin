@@ -3,6 +3,10 @@ import type { Path, Visit } from 'swup';
 
 import { MatchFunction, MatchOptions } from './index.js';
 
+/**
+ * Animation object as supplied by plugin users.
+ * Contains path patterns and handler functions for in/out animation.
+ */
 export type Animation = {
 	/** The path pattern to match the current url against. */
 	from: Path;
@@ -14,6 +18,9 @@ export type Animation = {
 	in: (done: () => void, data: AnimationData) => void | Promise<void>;
 };
 
+/**
+ * Compiled animation object with pre-optimized match functions.
+ */
 export type CompiledAnimation = Animation & {
 	/** Match function to check if the `from` pattern matches a given URL */
 	matchesFrom: MatchFunction;
@@ -21,6 +28,9 @@ export type CompiledAnimation = Animation & {
 	matchesTo: MatchFunction;
 };
 
+/**
+ * Data object passed into the animation handler functions.
+ */
 export type AnimationData = {
 	visit: Visit;
 	direction: 'in' | 'out';
@@ -34,6 +44,16 @@ export type AnimationData = {
 		pattern: Path;
 		params: object;
 	};
+};
+
+/**
+ * The animation object to use when no other animation matches.
+ */
+export const defaultAnimation: Animation = {
+	from: '(.*)',
+	to: '(.*)',
+	out: (done) => done(),
+	in: (done) => done()
 };
 
 /**
