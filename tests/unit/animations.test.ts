@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vitest } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { compileAnimation, compileAnimations, findAnimation, rateAnimation } from '../../src/animations.js';
 import type { Animation } from '../../src/animations.js';
 
