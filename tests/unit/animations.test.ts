@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { compileAnimation, compileAnimations, findAnimation, rateAnimation } from '../../src/animations.js';
+import { assembleAnimationData, compileAnimation, compileAnimations, findAnimation, rateAnimation, runAnimation } from '../../src/animations.js';
 import type { Animation } from '../../src/animations.js';
 
 const example: Animation = {
@@ -94,5 +94,41 @@ describe('findAnimation', () => {
 		expect(findAnimation(animations, 'd', 'c')).toBe(animations[2]);
 		expect(findAnimation(animations, 'd', 'd')).toBe(animations[3]);
 		expect(findAnimation(animations, 'c', 'd')).toBe(animations[4]);
+	});
+});
+
+describe('runAnimation', () => {
+	it('returns a promise', () => {
+		const animation = compileAnimation({ ...example, from: 'a', to: 'b' });
+		const data = { direction: 'out', test: 'data' };
+		// @ts-ignore - we're testing the function, not the type
+		const run = runAnimation(animation, data);
+
+		expect(typeof run).toBe('object');
+		expect(typeof run.then).toBe('function');
+	});
+
+	it('calls the out animation handler', () => {
+		const fn = vi.fn();
+		const animation = compileAnimation({ out: fn, in: () => {}, from: 'a', to: 'b' });
+		const data = { direction: 'out', test: 'data' };
+
+		// @ts-ignore - we're testing the function, not the type
+		const run = runAnimation(animation, data);
+
+		expect(fn).toHaveBeenCalledTimes(1);
+		expect(fn).toHaveBeenCalledWith(expect.any(Function), data);
+	});
+
+	it('calls the in animation handler', () => {
+		const fn = vi.fn();
+		const animation = compileAnimation({ out: () => {}, in: fn, from: 'a', to: 'b' });
+		const data = { direction: 'in', test: 'data' };
+
+		// @ts-ignore - we're testing the function, not the type
+		const run = runAnimation(animation, data);
+
+		expect(fn).toHaveBeenCalledTimes(1);
+		expect(fn).toHaveBeenCalledWith(expect.any(Function), data);
 	});
 });
