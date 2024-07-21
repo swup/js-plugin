@@ -2,7 +2,13 @@ import Plugin from '@swup/plugin';
 import { matchPath } from 'swup';
 import type { Handler, Visit } from 'swup';
 
-import { assembleAnimationData, compileAnimations, defaultAnimation, findAnimationForVisit, runAnimation } from './animations.js';
+import {
+	assembleAnimationData,
+	compileAnimations,
+	defaultAnimation,
+	findAnimationForVisit,
+	runAnimation
+} from './animations.js';
 import type { Animation, CompiledAnimation } from './animations.js';
 
 type RequireKeys<T, K extends keyof T> = Partial<T> & Pick<T, K>;

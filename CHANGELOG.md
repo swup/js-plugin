@@ -46,7 +46,6 @@
 - Initial release
 
 [Unreleased]: https://github.com/swup/js-plugin/compare/3.1.1...HEAD
-
 [3.1.1]: https://github.com/swup/js-plugin/releases/tag/3.1.1
 [3.1.0]: https://github.com/swup/js-plugin/releases/tag/3.1.0
 [3.0.0]: https://github.com/swup/js-plugin/releases/tag/3.0.0

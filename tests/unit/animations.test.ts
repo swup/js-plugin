@@ -1,5 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
-import { assembleAnimationData, compileAnimation, compileAnimations, findAnimation, rateAnimation, runAnimation } from '../../src/animations.js';
+import {
+	assembleAnimationData,
+	compileAnimation,
+	compileAnimations,
+	findAnimation,
+	rateAnimation,
+	runAnimation
+} from '../../src/animations.js';
 import type { Animation } from '../../src/animations.js';
 
 const example: Animation = {
@@ -48,7 +55,7 @@ describe('compileAnimations', () => {
 	it('compiles each member of the array passed in', () => {
 		const compiled = compileAnimations([
 			{ ...example, from: 'a', to: 'b' },
-			{ ...example, from: 'b', to: 'c' },
+			{ ...example, from: 'b', to: 'c' }
 		]);
 
 		expect(compiled).toHaveLength(2);
@@ -85,7 +92,7 @@ describe('findAnimation', () => {
 			{ ...example, from: 'd', to: '(.*)' },
 			{ ...example, from: 'c', to: 'd' },
 			{ ...example, from: '(.*)', to: '(.*)' },
-			{ ...example, from: 'c', to: 'd' },
+			{ ...example, from: 'c', to: 'd' }
 		]);
 		expect(findAnimation(animations, 'a', 'b')).toBe(animations[0]);
 		expect(findAnimation(animations, 'a', 'c')).toBe(animations[2]);

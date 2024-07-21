@@ -59,14 +59,22 @@ export const defaultAnimation: Animation = {
 /**
  * Compile animations to match functions and transitions
  */
-export function compileAnimations(animations: Animation[], matchOptions?: MatchOptions): CompiledAnimation[] {
-	return animations.map((animation): CompiledAnimation => compileAnimation(animation, matchOptions));
+export function compileAnimations(
+	animations: Animation[],
+	matchOptions?: MatchOptions
+): CompiledAnimation[] {
+	return animations.map(
+		(animation): CompiledAnimation => compileAnimation(animation, matchOptions)
+	);
 }
 
 /**
  * Compile path patterns to match functions and transitions
  */
-export function compileAnimation(animation: Animation, matchOptions?: MatchOptions): CompiledAnimation {
+export function compileAnimation(
+	animation: Animation,
+	matchOptions?: MatchOptions
+): CompiledAnimation {
 	const matchesFrom = matchPath(animation.from, matchOptions);
 	const matchesTo = matchPath(animation.to, matchOptions);
 	return { ...animation, matchesFrom, matchesTo };
@@ -75,7 +83,12 @@ export function compileAnimation(animation: Animation, matchOptions?: MatchOptio
 /**
  * Rate animation based on the match
  */
-export function rateAnimation(animation: CompiledAnimation, from: string, to: string, name?: string): number {
+export function rateAnimation(
+	animation: CompiledAnimation,
+	from: string,
+	to: string,
+	name?: string
+): number {
 	let rating = 0;
 
 	// Check if route patterns match
@@ -99,14 +112,22 @@ export function rateAnimation(animation: CompiledAnimation, from: string, to: st
 /**
  * Find the best matching animation given a visit object
  */
-export function findAnimationForVisit(animations: CompiledAnimation[], visit: Visit): CompiledAnimation | null {
+export function findAnimationForVisit(
+	animations: CompiledAnimation[],
+	visit: Visit
+): CompiledAnimation | null {
 	return findAnimation(animations, visit.from.url, visit.to.url, visit.animation.name);
 }
 
 /**
  * Find the best matching animation by ranking them against each other
  */
-export function findAnimation(animations: CompiledAnimation[], from: string, to: string, name?: string): CompiledAnimation | null {
+export function findAnimation(
+	animations: CompiledAnimation[],
+	from: string,
+	to: string,
+	name?: string
+): CompiledAnimation | null {
 	let topRating = 0;
 
 	const animation: CompiledAnimation | null = animations.reduceRight(
@@ -128,7 +149,11 @@ export function findAnimation(animations: CompiledAnimation[], from: string, to:
 /**
  * Create an object with all the data passed into the animation handler function
  */
-export function assembleAnimationData(animation: CompiledAnimation, visit: Visit, direction: 'in' | 'out'): AnimationData {
+export function assembleAnimationData(
+	animation: CompiledAnimation,
+	visit: Visit,
+	direction: 'in' | 'out'
+): AnimationData {
 	const matchFrom = animation.matchesFrom(visit.from.url);
 	const matchTo = animation.matchesTo(visit.to.url!);
 
@@ -146,8 +171,7 @@ export function assembleAnimationData(animation: CompiledAnimation, visit: Visit
 			params: matchTo ? matchTo.params : {}
 		}
 	};
-};
-
+}
 
 /**
  * Run an animation handler function and resolve when it's done.

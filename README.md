@@ -197,7 +197,7 @@ See the example below for more info.
 
 ```js
 [
-    // animation 1
+  // animation 1
   { from: '/', to: 'custom' },
   // animation 2
   { from: '/', to: '/post' },

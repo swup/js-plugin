@@ -108,7 +108,9 @@ describe('SwupJsPlugin', () => {
 			runAnimation: vi.fn()
 		}));
 
-		const { findAnimationForVisit, runAnimation, assembleAnimationData } = await import('../../src/animations.js');
+		const { findAnimationForVisit, runAnimation, assembleAnimationData } = await import(
+			'../../src/animations.js'
+		);
 		const { default: Plugin } = await import('../../src/index.js');
 		plugin = new Plugin({ animations: [example] });
 		swup.use(plugin);
