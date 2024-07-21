@@ -75,7 +75,7 @@ export function compileAnimation(animation: Animation, matchOptions?: MatchOptio
 /**
  * Rate animation based on the match
  */
-export function rateAnimation(animation: CompiledAnimation, from: string, to: string, name: string | undefined): number {
+export function rateAnimation(animation: CompiledAnimation, from: string, to: string, name?: string): number {
 	let rating = 0;
 
 	// Check if route patterns match
@@ -106,7 +106,7 @@ export function findAnimationForVisit(animations: CompiledAnimation[], visit: Vi
 /**
  * Find the best matching animation by ranking them against each other
  */
-export function findAnimation(animations: CompiledAnimation[], from: string, to: string, name: string | undefined): CompiledAnimation | null {
+export function findAnimation(animations: CompiledAnimation[], from: string, to: string, name?: string): CompiledAnimation | null {
 	let topRating = 0;
 
 	const animation: CompiledAnimation | null = animations.reduceRight(
