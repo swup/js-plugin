@@ -66,7 +66,7 @@ export function compileAnimations(animations: Animation[], matchOptions?: MatchO
 /**
  * Compile path patterns to match functions and transitions
  */
-function compileAnimation(animation: Animation, matchOptions?: MatchOptions): CompiledAnimation {
+export function compileAnimation(animation: Animation, matchOptions?: MatchOptions): CompiledAnimation {
 	const matchesFrom = matchPath(animation.from, matchOptions);
 	const matchesTo = matchPath(animation.to, matchOptions);
 	return { ...animation, matchesFrom, matchesTo };
