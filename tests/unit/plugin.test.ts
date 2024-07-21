@@ -20,6 +20,7 @@ describe('SwupJsPlugin', () => {
 	let visit: Visit;
 
 	beforeEach(() => {
+		vi.resetModules();
 		swup = new Swup();
 		plugin = new SwupJsPlugin({ animations: [example] });
 		// @ts-ignore - createVisit is marked internal
@@ -100,7 +101,8 @@ describe('SwupJsPlugin', () => {
 		const data = { test: 'data' };
 		const compiled = compileAnimation(example);
 
-		vi.doMock('../../src/animations.js', () => ({
+		vi.doMock('../../src/animations.js', async (importOriginal) => ({
+			...(await importOriginal()),
 			findAnimationForVisit: vi.fn(() => compiled),
 			assembleAnimationData: vi.fn(() => data),
 			runAnimation: vi.fn()
@@ -111,12 +113,7 @@ describe('SwupJsPlugin', () => {
 		plugin = new Plugin({ animations: [example] });
 		swup.use(plugin);
 
-		await swup.hooks.call('animation:out:await', visit, { skip: false }, () => {});
-
-		console.log(await plugin.findAndRunAnimation(visit, 'out'));
-		// console.log(Plugin);
-
-		// await plugin.findAndRunAnimation(visit, 'out');
+		await plugin.findAndRunAnimation(visit, 'out');
 
 		expect(findAnimationForVisit).toHaveBeenCalledWith(plugin.animations, visit);
 		expect(assembleAnimationData).toHaveBeenCalledWith(compiled, visit, 'out');
