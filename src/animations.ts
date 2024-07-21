@@ -1,4 +1,4 @@
-import { matchPath } from 'swup';
+import { isPromise, matchPath } from 'swup';
 import type { Path, Visit } from 'swup';
 
 import { MatchFunction, MatchOptions } from './index.js';
@@ -58,7 +58,7 @@ function compileAnimation(animation: Animation, matchOptions?: MatchOptions): Co
 export function rateAnimation(animation: CompiledAnimation, from: string, to: string, name: string | undefined): number {
 	let rating = 0;
 
-	// check if route patterns match
+	// Check if route patterns match
 	const fromMatched = animation.matchesFrom(from);
 	const toMatched = animation.matchesTo(to);
 	if (fromMatched) {
@@ -68,7 +68,7 @@ export function rateAnimation(animation: CompiledAnimation, from: string, to: st
 		rating += 1;
 	}
 
-	// beat all others if custom name fits
+	// Beat all others if custom name fits
 	if (fromMatched && animation.to === name) {
 		rating += 2;
 	}
@@ -77,9 +77,16 @@ export function rateAnimation(animation: CompiledAnimation, from: string, to: st
 }
 
 /**
- * Find best animation by ranking animations against each other
+ * Find the best matching animation given a visit object
  */
-export function matchAnimation(animations: CompiledAnimation[], from: string, to: string, name: string | undefined): CompiledAnimation | null {
+export function findAnimationForVisit(animations: CompiledAnimation[], visit: Visit): CompiledAnimation | null {
+	return findAnimation(animations, visit.from.url, visit.to.url, visit.animation.name);
+}
+
+/**
+ * Find the best matching animation by ranking them against each other
+ */
+export function findAnimation(animations: CompiledAnimation[], from: string, to: string, name: string | undefined): CompiledAnimation | null {
 	let topRating = 0;
 
 	const animation: CompiledAnimation | null = animations.reduceRight(
@@ -96,4 +103,49 @@ export function matchAnimation(animations: CompiledAnimation[], from: string, to
 	);
 
 	return animation;
+}
+
+/**
+ * Create an object with all the data passed into the animation handler function
+ */
+export function assembleAnimationData(animation: CompiledAnimation, visit: Visit, direction: 'in' | 'out'): AnimationData {
+	const matchFrom = animation.matchesFrom(visit.from.url);
+	const matchTo = animation.matchesTo(visit.to.url!);
+
+	return {
+		visit,
+		direction,
+		from: {
+			url: visit.from.url,
+			pattern: animation.from,
+			params: matchFrom ? matchFrom.params : {}
+		},
+		to: {
+			url: visit.to.url!,
+			pattern: animation.to,
+			params: matchTo ? matchTo.params : {}
+		}
+	};
+};
+
+
+/**
+ * Run an animation handler function and resolve when it's done.
+ */
+export function runAnimation(animation: CompiledAnimation, data: AnimationData): Promise<void> {
+	const { direction } = data;
+	const animationFn = animation[direction];
+	if (!animationFn) {
+		console.warn(`Missing animation function for '${direction}' phase`);
+		return Promise.resolve();
+	}
+
+	return new Promise((resolve) => {
+		/* Sync API: Pass `done` callback into animation handler so it can resolve manually */
+		const result = animationFn(() => resolve(), data);
+		/* Async API: Receive a promise from animation handler so we resolve it here */
+		if (isPromise(result)) {
+			result.then(resolve);
+		}
+	});
 }

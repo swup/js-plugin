@@ -1,7 +1,9 @@
 import Plugin from '@swup/plugin';
-import { matchPath, isPromise } from 'swup';
+import { matchPath } from 'swup';
 import type { Handler, Visit } from 'swup';
-import { Animation, AnimationData, compileAnimations, CompiledAnimation, matchAnimation } from './animations.js';
+
+import { assembleAnimationData, compileAnimations, findAnimationForVisit, runAnimation } from './animations.js';
+import type { Animation, CompiledAnimation } from './animations.js';
 
 type RequireKeys<T, K extends keyof T> = Partial<T> & Pick<T, K>;
 
@@ -33,16 +35,16 @@ export default class SwupJsPlugin extends Plugin {
 	animations: CompiledAnimation[] = [];
 
 	defaultAnimation: Animation = {
-    from: '(.*)',
-    to: '(.*)',
-    out: (done) => done(),
-    in: (done) => done()
-  };
+		from: '(.*)',
+		to: '(.*)',
+		out: (done) => done(),
+		in: (done) => done()
+	};
 
 	constructor(options: InitOptions) {
 		super();
 
-		// Backward compatibility
+		// Backward compatibility: allow passing an array of animations directly
 		if (Array.isArray(options)) {
 			options = { animations: options as Animation[] };
 		}
@@ -53,60 +55,36 @@ export default class SwupJsPlugin extends Plugin {
 	}
 
 	mount() {
-		this.replace('animation:in:await', this.awaitInAnimation, { priority: -1 });
 		this.replace('animation:out:await', this.awaitOutAnimation, { priority: -1 });
+		this.replace('animation:in:await', this.awaitInAnimation, { priority: -1 });
 	}
 
-	awaitInAnimation: Handler<'animation:in:await'> = async (visit, { skip }) => {
-		if (skip) return;
-		const animation = matchAnimation(this.animations, visit.from.url, visit.to.url, visit.animation.name);
-		if (animation) {
-			await this.createAnimationPromise(animation, visit, 'in');
-		}
-	};
-
+	/**
+	 * Replace swup's internal out-animation handler.
+	 * Finds and runs the 'in' animation for the current visit.
+	 */
 	awaitOutAnimation: Handler<'animation:out:await'> = async (visit, { skip }) => {
 		if (skip) return;
-		const animation = matchAnimation(this.animations, visit.from.url, visit.to.url, visit.animation.name);
-		if (animation) {
-			await this.createAnimationPromise(animation, visit, 'out');
-		}
+		await this.findAndRunAnimation(visit, 'out');
 	};
 
-	createAnimationPromise(animation: CompiledAnimation, visit: Visit, direction: 'in' | 'out'): Promise<void> {
-		const animationFn = animation[direction];
-		if (!animationFn) {
-			console.warn(`Missing animation function for '${direction}' phase`);
-			return Promise.resolve();
+	/**
+	 * Replace swup's internal in-animation handler handler.
+	 * Finds and runs the 'in' animation for the current visit.
+	 */
+	awaitInAnimation: Handler<'animation:in:await'> = async (visit, { skip }) => {
+		if (skip) return;
+		await this.findAndRunAnimation(visit, 'in');
+	};
+
+	/**
+	 * Find the best matching animation for the visit and run its handler function.
+	 */
+	async findAndRunAnimation(visit: Visit, direction: 'in' | 'out'): Promise<void> {
+		const animation = findAnimationForVisit(this.animations, visit);
+		if (animation) {
+			const data = assembleAnimationData(animation, visit, direction);
+			await runAnimation(animation, data);
 		}
-
-		return new Promise((resolve) => {
-			const data = this.getAnimationData(animation, visit, direction);
-			const result = animationFn(() => resolve(), data);
-			if (isPromise(result)) {
-				result.then(resolve);
-			}
-		});
 	}
-
-	getAnimationData(animation: CompiledAnimation, visit: Visit, direction: 'in' | 'out'): AnimationData {
-		const matchFrom = animation.matchesFrom(visit.from.url);
-		const matchTo = animation.matchesTo(visit.to.url!);
-
-		return {
-			visit,
-			direction,
-			from: {
-				url: visit.from.url,
-				pattern: animation.from,
-				params: matchFrom ? matchFrom.params : {}
-			},
-			to: {
-				url: visit.to.url!,
-				pattern: animation.to,
-				params: matchTo ? matchTo.params : {}
-			}
-		};
-	}
-
 }
