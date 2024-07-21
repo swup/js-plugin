@@ -3,7 +3,7 @@ import Swup from 'swup';
 import type { Visit } from 'swup';
 
 import SwupJsPlugin from '../../src/index.js';
-import type { Animation } from '../../src/animations.js';
+import { compileAnimation, type Animation } from '../../src/animations.js';
 
 // vi.mock('../../src/animations.js');
 
@@ -49,7 +49,7 @@ describe('SwupJsPlugin', () => {
 
 	it('replaces the out animation handler', async () => {
 		const defaultHandler = vi.fn();
-		const newHandler = vi.spyOn(plugin, 'awaitOutAnimation').mockImplementation(() => {});
+		const newHandler = vi.spyOn(plugin, 'awaitOutAnimation').mockImplementation(async () => {});
 		swup.use(plugin);
 
 		await swup.hooks.call('animation:out:await', visit, { skip: false }, defaultHandler);
@@ -61,7 +61,7 @@ describe('SwupJsPlugin', () => {
 
 	it('replaces the in animation handler', async () => {
 		const defaultHandler = vi.fn();
-		const newHandler = vi.spyOn(plugin, 'awaitInAnimation').mockImplementation(() => {});
+		const newHandler = vi.spyOn(plugin, 'awaitInAnimation').mockImplementation(async () => {});
 		swup.use(plugin);
 
 		await swup.hooks.call('animation:in:await', visit, { skip: false }, defaultHandler);
@@ -75,28 +75,51 @@ describe('SwupJsPlugin', () => {
 		const spy = vi.spyOn(plugin, 'findAndRunAnimation').mockImplementation(async () => {});
 		swup.use(plugin);
 
-		await swup.hooks.call('animation:out:await', visit, { skip: false });
+		await swup.hooks.call('animation:out:await', visit, { skip: false }, () => {});
 
 		expect(spy).toHaveBeenCalledTimes(1);
 		expect(spy).toHaveBeenCalledWith(visit, 'out');
+
+		await swup.hooks.call('animation:in:await', visit, { skip: false }, () => {});
+
+		expect(spy).toHaveBeenCalledTimes(2);
+		expect(spy).toHaveBeenCalledWith(visit, 'in');
 	});
 
-	// it('respects the skip flag in arguments', async () => {
-	// 	const spy = vi.spyOn(plugin, 'findAndRunAnimation').mockImplementation(async () => {});
-	// 	swup.use(plugin);
+	it('respects the skip flag in arguments', async () => {
+		const spy = vi.spyOn(plugin, 'findAndRunAnimation').mockImplementation(async () => {});
+		swup.use(plugin);
 
-	// 	await swup.hooks.call('animation:out:await', visit, { skip: false });
+		await swup.hooks.call('animation:out:await', visit, { skip: true }, () => {});
+		await swup.hooks.call('animation:in:await', visit, { skip: true }, () => {});
 
-	// 	expect(spy).toHaveBeenCalledTimes(1);
-	// 	expect(spy).toHaveBeenCalledWith(visit, 'out');
+		expect(spy).toHaveBeenCalledTimes(0);
+	});
 
-	// 	await swup.hooks.call('animation:in:await', visit, { skip: true });
+	it('finds and runs animation with generated data', async () => {
+		const data = { test: 'data' };
+		const compiled = compileAnimation(example);
 
-	// 	expect(spy).toHaveBeenCalledTimes(1);
+		vi.doMock('../../src/animations.js', () => ({
+			findAnimationForVisit: vi.fn(() => compiled),
+			assembleAnimationData: vi.fn(() => data),
+			runAnimation: vi.fn()
+		}));
 
-	// 	await swup.hooks.call('animation:in:await', visit, { skip: false });
+		const { findAnimationForVisit, runAnimation, assembleAnimationData } = await import('../../src/animations.js');
+		const { default: Plugin } = await import('../../src/index.js');
+		plugin = new Plugin({ animations: [example] });
+		swup.use(plugin);
 
-	// 	expect(spy).toHaveBeenCalledTimes(2);
-	// 	expect(spy).toHaveBeenCalledWith(visit, 'in');
-	// });
+		await swup.hooks.call('animation:out:await', visit, { skip: false }, () => {});
+
+		console.log(await plugin.findAndRunAnimation(visit, 'out'));
+		// console.log(Plugin);
+
+		// await plugin.findAndRunAnimation(visit, 'out');
+
+		expect(findAnimationForVisit).toHaveBeenCalledWith(plugin.animations, visit);
+		expect(assembleAnimationData).toHaveBeenCalledWith(compiled, visit, 'out');
+		expect(runAnimation).toHaveBeenCalledWith(compiled, data);
+	});
 });
