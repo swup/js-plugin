@@ -13,6 +13,7 @@ wiki-wishlist
 *.sublime-workspace
 .editorconfig
 .idea
-dist
-/plugins
-*.tgz
+/dist
+/tests/fixtures/dist
+/tests/reports
+/tests/results
