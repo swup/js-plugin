@@ -1,9 +1,9 @@
 name: Redeploy Docs
 on:
   push:
-    branches: [master]
+    branches: [main]
 
 jobs:
   redeploy-docs:
-    uses: swup/.github/.github/workflows/redeploy-docs.yml@master
+    uses: swup/.github/.github/workflows/redeploy-docs.yml@main
     secrets: inherit
